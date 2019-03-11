@@ -60,6 +60,12 @@
     <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            
+            <configuration>
+        		<source>1.8</source>
+        		<target>1.8</target>
+    		</configuration>
+            
             <executions>
                 <execution>
                     <phase>package</phase>
@@ -73,6 +79,7 @@
                                 <destFileName>webapp-runner.jar</destFileName>
                             </artifactItem>
                         </artifactItems>
+                        
                     </configuration>
                 </execution>
             </executions>
