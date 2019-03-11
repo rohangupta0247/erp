@@ -7,13 +7,13 @@
     <session-factory>  
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5433/postgres</property>
+        <!--property name="hibernate.connection.url">jdbc:postgresql://localhost:5433/postgres</property>
         <property name="hibernate.connection.username">postgres</property>
-        <property name="hibernate.connection.password">postgresql</property>
+        <property name="hibernate.connection.password">postgresql</property-->
   
-        <!--property name="hibernate.connection.url">jdbc:postgresql://ec2-54-163-246-159.compute-1.amazonaws.com:5432/d4r5i7eda2v4mu?sslmode=require</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://ec2-54-163-246-159.compute-1.amazonaws.com:5432/d4r5i7eda2v4mu?sslmode=require</property>
         <property name="hibernate.connection.username">afjvyrmmevfwqk</property>
-        <property name="hibernate.connection.password">574599e55ca063b421b1b0c90906d88bf059bd2ce1d7ef8c4117d65ab73486d9</property-->
+        <property name="hibernate.connection.password">574599e55ca063b421b1b0c90906d88bf059bd2ce1d7ef8c4117d65ab73486d9</property>
        
         <property name="hibernate.default_schema">public</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
