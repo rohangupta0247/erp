@@ -1,7 +1,6 @@
-<%@page import="com.saptris.erp.db.User"%>
-<%@page import="org.hibernate.Session"%>
-<%@page import="org.hibernate.cfg.Configuration"%>
-<%@page import="org.hibernate.SessionFactory"%>
+<%@page import="com.saptris.erp.JspStream"%>
+<%@page import="com.saptris.erp.UserManager"%>
+<%@page import="com.saptris.erp.User"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -11,29 +10,41 @@
 <title>ERP</title>
 </head>
 <body>
+<%@page session="false" %>
 <%
+	HttpSession session=null;
 	String username= request.getParameter("username");
 	String password= request.getParameter("password");
-	SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-	Session hbnSession = factory.openSession();
-	
-	String jpql = "select u from User u where u.username = :name";
-	User u=null;
-    try{
-    	u = hbnSession.createQuery(jpql, User.class).setParameter("name", username).getSingleResult();
-    	System.out.println("\n\n\nSearched: "+u+"\n\n");
-	if(u.getUsername().equals(username) && u.getPass().equals(password)){
-		out.print("Welcome "+u.getName());
+	try{
+	User u=new User();
+	int status= UserManager.validateLogin(username, password,u);
+	if(status==UserManager.VALID_USER){
+		session= request.getSession();
+		
+		session.setAttribute("username", u.getUsername());
+		session.setAttribute("name", u.getName());
+		session.setAttribute("email", u.getEmail());
+		session.setAttribute("pass", u.getPass());
+		
+		out.print("Welcome "+session.getAttribute("name").toString());
+		
+		String from= request.getParameter("from");
+		if(from==null)
+			from="../";
+		response.sendRedirect(from);
 	}
-	else
-		out.print("Wrong credentials");
+	else if(status==UserManager.INVALID_USERNAME){
+		out.print("Not signed up yet, go to signup"+
+	"<br><a href=../signup>SignUp</a>");
+		response.sendRedirect("signup");
 	}
-	catch(Exception e){
-		out.print("Wrong credentials");
+	else if(status==UserManager.INVALID_PASSWORD){
+		out.print("Wrong password");
 	}
-	
-    hbnSession.close();
-    factory.close();
+	}
+    catch(Exception e){
+    	JspStream.printException(e,out);
+    }
 %>
 </body>
 </html>
