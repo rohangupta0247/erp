@@ -20,7 +20,8 @@
 <%
 	HttpSession session= UserManager.getSession(request);
 	String from= request.getRequestURI()+"?"+request.getQueryString();
-	if(session==null){
+	String condition="Menu";
+	/*if(session==null){
 		out.print("<a href=\"login?from="+from+"\">Login</a><br>");
 		//response.sendRedirect("login?from="+from);
 		//in this case we dont want further as it is main page
@@ -29,30 +30,105 @@
 	else
 		out.print(session.getAttribute("name")+"'s ERP"+
 		"<br><a href=\"logout\">Logout</a><br>");
+	*/
+	if(session!=null){
+		condition= session.getAttribute("name").toString();
+	}
 %>
 
 <div class="jumbotron text-center" style="margin-bottom: 0">
 		<h1>ERP</h1>
 	</div>
 
-	<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-		<a class="navbar-brand" href="#">Menu</a>
+	<nav class="navbar navbar-expand-sm bg-dark navbar-dark" id="homeNavBar">
+		<a class="navbar-brand" href="#"><%= condition %></a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse"
 			data-target="#collapsibleNavbar">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="collapsibleNavbar">
 			<ul class="navbar-nav">
-				<li class="nav-item"><a class="nav-link"
-					href="view?query=Company">Company</a></li>
-				<li class="nav-item"><a class="nav-link"
-					href="view?query=Warehouse">Warehouse</a></li>
-				<li class="nav-item"><a class="nav-link"
-					href="view?query=Item">Inventory</a></li>
+				<% if(session==null){ %>
+				<li class="nav-item"><a class="nav-link" href="login">LogIn</a></li>
+				<li class="nav-item"><a class="nav-link" href="signup">SignUp</a></li>
+				<% } else { %>
+				<li class="nav-item"><a class="nav-link" href="logout">LogOut</a></li>
+				<% } %>
 			</ul>
 		</div>
 	</nav>
 
 
-<a href="save?query=Company&status=add">Add Company</a>
+<a href="view">View Company</a><br>
+<a href="payroll">Payroll</a><br>
+
+
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.flip-card {
+  background-color: transparent;
+  width: 300px;
+  height: 300px;
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+  background-color: #bbb;
+  color: black;
+  z-index: 2;
+}
+
+.flip-card-back {
+  background-color: #2980b9;
+  color: white;
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+</style>
+
+<h1>Card Flip with Text</h1>
+<h3>Hover over the image below:</h3>
+
+<div class="flip-card">
+  <div class="flip-card-inner">
+    <div class="flip-card-front">
+      <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="width:300px;height:300px;">
+    </div>
+    <div class="flip-card-back">
+      <h1>Company</h1> 
+      <p>Manage your company</p> 
+      <p>Set all company related details</p>
+      <div align="center">
+		<a href="view" class="btn btn-primary" style="margin-top:20px;" role="button">View Company</a>
+	</div>
+    </div>
+  </div>
+</div>
+
+
+
 <jsp:include page="footer.jsp" />

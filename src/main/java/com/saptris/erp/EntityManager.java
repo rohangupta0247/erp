@@ -1,7 +1,8 @@
 package com.saptris.erp;
 
 import java.lang.reflect.Field;
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,9 +13,8 @@ import java.util.TreeMap;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -22,10 +22,12 @@ import org.hibernate.query.Query;
 
 import com.saptris.erp.annotation.Attribute;
 import com.saptris.erp.annotation.NotNull;
+import com.saptris.erp.db.hrm.Employee;
+import com.saptris.erp.pmm.ReminderScheduler;
 
 public class EntityManager/*<E>*/ {
-	//TODO package name
-	private /*static*/ final String packageName="com.saptris.erp.db.";
+	//package name
+	//private final String packageName="com.saptris.erp.db.";
 	
 	public static final String separator="><.><";
 	public static final String idSeparator="}{.}{";
@@ -33,12 +35,21 @@ public class EntityManager/*<E>*/ {
 	public static final int ADD_RECORD=1;
 	public static final int UPDATE_RECORD=2;
 	
+	private String packageName;
 	private Class<?> entityClass;
-	private Object/*<E>*/ entity;
 	
 	public EntityManager(String entityClassName){
+		String classString="<empty class string>";
 		try {
-			Class<?> classCheck= Class.forName(packageName+entityClassName);
+			packageName= SessionFactoryBuilder.classesMapping.get(entityClassName);
+			
+			String temp=packageName;
+			if(entityClassName.equals("MaintenanceAllUsers"))
+				temp= "com.saptris.erp.";
+			
+			classString= temp+entityClassName;
+			
+			Class<?> classCheck= Class.forName(classString);
 			//Class<?> classCheck= entity.getClass();
 			
 			if(classCheck.getAnnotation(Entity.class)==null)
@@ -47,7 +58,7 @@ public class EntityManager/*<E>*/ {
 				entityClass= classCheck;
 		}
 		catch(Exception e) {
-			throw new HibernateException("Some unexpected error occured while creating EntityManager for "+entityClass.getName(), e);
+			throw new HibernateException("Some unexpected error occured while creating EntityManager for "+classString, e);
 		}
 	} 
 	
@@ -71,7 +82,7 @@ public class EntityManager/*<E>*/ {
 			String jpql = "select e from "+entityClass.getName()+" e where e."+idAttribute+" = "+id;
 			//Type safety: Unchecked cast from capture#8-of ? to E
 			entity= (E) hbnSession.createQuery(jpql, entityClass).getSingleResult();*/
-			entity= /*(E) */hbnSession.get(entityClass, id);
+			Object entity= /*(E) */hbnSession.get(entityClass, id);
 			return entity;
 		}
 		catch(Exception e){
@@ -165,7 +176,11 @@ public class EntityManager/*<E>*/ {
 	public /*static*/ List<?> getAllEntity(/*String entityClassName*/) {
 		Session hbnSession = null;
 		try{
-			hbnSession = SessionFactoryBuilder.getUserSessionFactory().openSession();
+			if(entityClass==MaintenanceAllUsers.class)
+				hbnSession = SessionFactoryBuilder.getDefaultSessionFactory().openSession();
+			else
+				hbnSession = SessionFactoryBuilder.getUserSessionFactory().openSession();
+			
 			
 			//String jpql = "select e from "+entityClass.getName()+" e";
 			//@SuppressWarnings("unchecked")
@@ -182,34 +197,59 @@ public class EntityManager/*<E>*/ {
 	}
 
 	/**
-	 * Requires columnName string of form "First Name"
+	 * Requires columnName string of form "first_name"
 	 * 
 	 * @param columnName in which searching is to be done
 	 * @param searchItem that is to be searched
 	 *
 	 * @return String[][]
 	 */
-	public String[][] search(String columnName, String searchItem) {
+	public String[][] search(String columnName, String searchItem /*, int maxResult, int startPosition*/) {
+		/*Query<?> query= (Query<?>) hbnSession.createQuery("from "+entityClass.getName());
+		//index of parameter starts from 1
+		query.setFirstResult(startPosition-1);
+		query.setMaxResults(maxResult);
+		return query.list();
+			List<?> list= getAllEntity(maxResult, startPosition);
+			//Iterator<?> itr= list.iterator();
+			int i=0,length= getAttributesName().length;
+			String res[][]= new String[maxResult][length];
+			for(Object o: list) {
+					res[i++]= mapObject(o);
+			}
+			return res;
+		 */
+		
 		if(columnName==null || columnName.equals(""))
 			throw new IllegalArgumentException("Empty columnName");
 		if(searchItem==null || searchItem.equals(""))
 			return new String[0][];
 		
-		columnName= toUnderscoreCase(columnName);
+		//columnName= toUnderscoreCase(columnName);
 		
 		/*select * from table where columnName like '%searchItem%'*/
 		Session hbnSession = null;
 		try{
 			hbnSession = SessionFactoryBuilder.getUserSessionFactory().openSession();
 			
+			/*
 			CriteriaBuilder cb= hbnSession.getCriteriaBuilder();
 			@SuppressWarnings("unchecked")
 			CriteriaQuery<Object> cq = (CriteriaQuery<Object>) cb.createQuery(entityClass);			
 			Root<?> root= cq.from(entityClass);
-			cq.select(root).where(cb.like(root.get(columnName), "%"+searchItem+"%"));
+			
+			String likeString= searchItem.toLowerCase();
+			if(entityClass.getDeclaredField(columnName).getType()==String.class) {
+				likeString= "%"+searchItem.toLowerCase()+"%";
+			}
+			
+			cq.select(root).where(cb.like(cb.lower(root.get(columnName)), likeString));
 			
 			List<?> list= hbnSession.createQuery(cq).list();
-			 
+			*/
+			
+			List<?> list= ((Query<?>) hbnSession.createQuery("from "+entityClass.getName()+" e where str(e."+columnName+") like '%"+searchItem+"%'")).list();
+
 			int i=0,length= getAttributesName().length;
 			String res[][]= new String[list.size()][length];
 			for(Object o: list) {
@@ -217,6 +257,10 @@ public class EntityManager/*<E>*/ {
 			}
 			
 			return res;
+		}
+		//for searching int with String query
+		catch(ClassCastException e){
+			return new String[0][];
 		}
 		catch(Exception e){
 			throw new HibernateException("Some unexpected error occured while searching", e);
@@ -320,12 +364,22 @@ public class EntityManager/*<E>*/ {
 
 			Field attributes[]= entityClass.getDeclaredFields();
 			for(Field m: attributes) {
-				JoinColumn jc= m.getAnnotation(JoinColumn.class);				
 				Attribute attr= m.getAnnotation(Attribute.class);				
+				JoinColumn jc= m.getAnnotation(JoinColumn.class);				
+				OneToOne oto= m.getAnnotation(OneToOne.class);				
+				OneToMany otm= m.getAnnotation(OneToMany.class);				
 				if(attr!=null) {
 					//TODO input types in this method, save/index.jsp and saveRecord method
-					if(jc!=null)
-						map.put(attr.index(), "select");
+					if(jc!=null) {
+						if(m.getType()==User.class)
+							map.put(attr.index(), "user");
+						else if(oto!=null) {
+							map.put(attr.index(), "select");
+						}
+						else if(otm!=null) {
+							map.put(attr.index(), "add-more");
+						}
+					}
 					else {
 						if(m.getType()==String.class)
 							map.put(attr.index(), "text");
@@ -333,8 +387,10 @@ public class EntityManager/*<E>*/ {
 							map.put(attr.index(), "number");
 						else if(m.getType()==double.class)
 							map.put(attr.index(), "numberAnyStep");
-						else if(m.getType()==Date.class)
+						else if(m.getType()==java.sql.Date.class)
 							map.put(attr.index(), "date");
+						else if(m.getType()==java.util.Date.class)
+							map.put(attr.index(), "datetime");
 					}
 				}
 			}
@@ -428,6 +484,46 @@ public class EntityManager/*<E>*/ {
 	}
 	
 	/**
+	 * Converts string of form "UnderScore" to form "Under Score"
+	 * 
+	 * @param string that is to be converted
+	 *
+	 * @return String
+	 */
+	public static String toNamingCaseFromCamelCase(String string) {
+		int i;
+		char c[]= string.toCharArray();
+		String temp=""+c[0];
+		for(i=1; i<c.length; i++) {
+			if(c[i]>=65 && c[i]<=90)
+				temp+=" ";
+			temp+=c[i];
+		}
+		return temp;
+	}
+	
+	/**
+	 * Converts string of form "UnderScore" to form "under_score"
+	 * 
+	 * @param string that is to be converted
+	 *
+	 * @return String
+	 */
+	public static String toUnderscoreCaseFromCamelCase(String string) {
+		int i;
+		char c[]= string.toCharArray();
+		String temp=""+ (char)(c[0]+32);
+		for(i=1; i<c.length; i++) {
+			if(c[i]>=65 && c[i]<=90) {
+				temp+="_";
+				c[i]= (char)(c[i]+32);
+			}
+			temp+=c[i];
+		}
+		return temp;
+	}
+	
+	/**
 	 * Converts string of form "Under Score" to form "under_score"
 	 * 
 	 * @param string that is to be converted
@@ -476,6 +572,7 @@ public class EntityManager/*<E>*/ {
 		//Arrays.fill(paramArray, Object.class);
 		
 		String types[]= getAttributesType();
+		//TODO input types in this method, save/index.jsp and getAttributesType method
 		for(p=0; p<str.length; p++){
 			if(types[p].equals("text")){
 				paramArray[p]= String.class;
@@ -494,24 +591,37 @@ public class EntityManager/*<E>*/ {
 				obj[p]= Double.parseDouble(str[p]);
 			} 
 			else if(types[p].equals("date")){
-				paramArray[p]= Date.class;
+				paramArray[p]= java.sql.Date.class;
 				//try {
-					// if util.Date then use @Temporal(TemporalType.DATE) in entity classes
+					// if util.Date then use @Temporal(TemporalType.DATE) in entity classes to store only Date without time
 					//SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd");
 					//obj[p]= sdf.parse(str[p]);
 				if(str[p]==null || str[p].equals(""))
 					obj[p]= null;
 				else
-					obj[p]= Date.valueOf(str[p]);
+					obj[p]= java.sql.Date.valueOf(str[p]);
 				/*} catch (ParseException e) {
 					throw new HibernateException("Some unexpected error occured while parsing date to save a record: ", e);
 				}*/
+			} 
+			else if(types[p].equals("datetime")){
+				paramArray[p]= java.util.Date.class;
+				try {
+				//html datetime-local input type has format:- 2001-01-01T13:00
+				SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+				if(str[p]==null || str[p].equals(""))
+					obj[p]= null;
+				else
+					obj[p]= sdf.parse(str[p]);
+				} catch (ParseException e) {
+					throw new HibernateException("Some unexpected error occured while parsing date to save a record: ", e);
+				}
 			} 
 			else if(types[p].equals("select")){
 				Class<?> entityClassAttr;
 				String entityClassNameAttr=toNamingCase(keys[p]);
 				try {
-					entityClassAttr= Class.forName(packageName+entityClassNameAttr);
+					entityClassAttr= Class.forName(/*packageName*/SessionFactoryBuilder.classesMapping.get(entityClassNameAttr) +entityClassNameAttr);
 					if(entityClassAttr.getAnnotation(Entity.class)==null)
 						throw new Exception("Not an Entity class");
 				}
@@ -527,14 +637,25 @@ public class EntityManager/*<E>*/ {
 				else
 					obj[p]= new EntityManager(entityClassNameAttr).getEntity(Integer.parseInt(str[p]));
 			}
+			else if(types[p].equals("add-more")){
+				
+			}
+			else if(types[p].equals("user")) {
+				paramArray[p]= User.class;
+				obj[p]= UserManager.user;
+			}
 		}
 		
 		try{
 			Object res= entityClass.getConstructor(paramArray).newInstance(obj);
-			if(status==ADD_RECORD)
-				TransactionalSave.save(res);
+			if(status==ADD_RECORD) {
+				TransactionalOperation.save(res);
+				if(entityClass==MaintenanceAllUsers.class) {
+					ReminderScheduler.notifyForNewReminder((MaintenanceAllUsers)res);
+				}
+			}
 			else if(status==UPDATE_RECORD)
-				TransactionalSave.update(res);
+				TransactionalOperation.update(res);
 		}
 		catch(Exception e){
 			throw new HibernateException("Some unexpected error occured while saving "+entityClass.getName(), e);
@@ -565,8 +686,21 @@ public class EntityManager/*<E>*/ {
 	}*/
 		
 	public boolean delete(int primaryKey) {
-		
-		return false;
+		Session hbnSession = null;
+		try{
+			Object entity= getEntity(primaryKey);
+			if(entity instanceof Employee)
+				((Employee)entity).beforeDelete();
+			TransactionalOperation.delete(entity);
+			return true;
+		}
+		catch(Exception e){
+			throw new HibernateException("Some unexpected error occured while deleting entity of "+entityClass.getName(), e);
+		}
+		finally{
+			if(hbnSession!=null)
+				hbnSession.close();
+		}
 	}
 	
 	

@@ -51,7 +51,7 @@
     	<artifactId>javax.mail</artifactId>
     	<version>1.6.0</version>
 	</dependency>
-
+	
   </dependencies>
   <build>
     <finalName>ERP</finalName>

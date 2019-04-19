@@ -1,5 +1,11 @@
 package com.saptris.erp;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.persistence.Entity;
+
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.Identifier;
@@ -11,6 +17,13 @@ import org.hibernate.service.spi.ServiceException;
 public class SessionFactoryBuilder {
 	private static SessionFactory singletonObjectForUser;
 	private static SessionFactory singletonObject;
+	private static User savedUser;
+	private static String realPath;
+	private static final String relativeClassPath= "WEB-INF"+File.separator+"classes"+File.separator;
+	private static final String[] entityPackages= {"com.saptris.erp.db","com.saptris.erp.db.hrm"};
+	
+	public static HashMap<String, String> classesMapping= new HashMap<>();
+	
 	private SessionFactoryBuilder() {}
 	public static SessionFactory getDefaultSessionFactory() throws HibernateException{
 		if(singletonObjectForUser==null) {
@@ -40,7 +53,12 @@ public class SessionFactoryBuilder {
 		public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment jdbcEnvironment) {
 			if(UserManager.user==null)
 				return null;
-			return Identifier.toIdentifier(UserManager.user.getUsername()+"_"+EntityManager.toRunningCase(name.getText()));
+			
+			String nameOfTable= EntityManager.toUnderscoreCaseFromCamelCase(name.getText());
+			//if(nameOfTable.equals("maintenance_all_users") || nameOfTable.equals("user"))
+				//return Identifier.toIdentifier(nameOfTable);
+			
+			return Identifier.toIdentifier(UserManager.user.getUsername()+"_"+nameOfTable);
 		}
 
 		public Identifier toPhysicalSequenceName(Identifier name, JdbcEnvironment jdbcEnvironment) {
@@ -56,17 +74,83 @@ public class SessionFactoryBuilder {
 	public static SessionFactory getUserSessionFactory() throws HibernateException{
 		if(UserManager.user==null)
 			throw new HibernateException("Some unexpected error occured while building user based SessionFactory: User is null");
+		if(singletonObject!=null) {
+			//in case user's singelton SessionFactory was created but then some other user logins just after this
+			//then compare saved user with current user
+			if(savedUser!=UserManager.user)
+				singletonObject= null;
+		}
 		if(singletonObject==null) {
 			try {
+				if(realPath==null)
+					throw new IllegalStateException("The real path of web application was not set, use \" <% SessionFactoryBuilder.setRealPath(getServletContext().getRealPath(\"\")); %> \" in servlet");
+				
 				Configuration cfg= new Configuration();
+				
+				for(String pack: entityPackages) {
+					for(Class<?> c: SessionFactoryBuilder.getAllClasses(realPath+relativeClassPath , pack)) {
+						System.out.println(c);
+						if(c.getAnnotation(Entity.class)!=null)
+							cfg.addAnnotatedClass(c);
+						classesMapping.put(c.getSimpleName(), pack+".");
+					}
+				}
+					
 				cfg.setPhysicalNamingStrategy(new UserNamePhysicalNamingStrategy());
-				Configuration cfgNew= cfg.configure("hibernate.cfg.xml");
+				//Configuration cfgNew= cfg.configure("hibernate.cfg.xml");
+				Configuration cfgNew= cfg.configure();
 				singletonObject= cfgNew.buildSessionFactory();
+				//save user details for SessionFactory
+				savedUser= UserManager.user;
 			}
 			catch(Exception e) {
 				throw new HibernateException("Some unexpected error occured while building user based SessionFactory",e);
 			}
 		}
 		return singletonObject;
+	}
+	
+	public static void setRealPath(String realPathOfApplication) {
+		realPath= realPathOfApplication;
+	}
+	
+	public static Class<?>[] getAllClasses(String classPath, String packageName){
+		//System.out.println(System.getProperty("user.dir"));
+		if(classPath==null)
+			classPath="";
+		else if(! classPath.endsWith(File.separator))
+			classPath+= File.separator;
+		if(! packageName.endsWith("."))
+			packageName+= ".";
+		String temp= "";
+		for(char c: packageName.toCharArray()) {
+			if(c!='.')
+				temp+=c;
+			else
+				temp+=File.separator;
+			
+		}
+		
+		File dir= new File(classPath+temp);
+		if(!dir.isDirectory())
+			return null;
+		String namestemp[]= dir.list();
+		ArrayList<String> liststr= new ArrayList<>();
+		for(String stemp: namestemp) {
+			if(stemp.endsWith(".class"))
+				liststr.add(stemp);
+		}
+		String names[]= liststr.toArray(new String[] {});
+		if(names==null)
+			return null;
+		Class<?> res[]= new Class<?>[names.length];
+			try {
+				for(int i=0;i<names.length;i++)
+					//classname will not have any '.', so only one '.' in complete file name
+					res[i]= Class.forName(packageName+names[i].split("\\.")[0]);
+			} catch (ClassNotFoundException e) {
+				throw new HibernateException("Some unexpected error occured while getting all classes in package",e);
+			}
+		return res;
 	}
 }

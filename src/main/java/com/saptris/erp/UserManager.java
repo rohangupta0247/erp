@@ -15,6 +15,9 @@ public class UserManager {
 	public static int INVALID_USERNAME= 3;
 	
 	/*private*/ static User user;
+	public static User getUser(){
+		return user;
+	}
 	
 	public static void signup(String username, String email, String name, String phone, String pass) throws HibernateException{
 		addUser(username, email, name, phone, pass);
@@ -30,8 +33,8 @@ public class UserManager {
 	    
 	    txn.commit();
 	    
-	    //to setup all other data
 	    user=u;
+	    //to setup all other data during signup
 	    SessionFactoryBuilder.getUserSessionFactory();
 		}
 		catch(Exception e){
@@ -57,6 +60,9 @@ public class UserManager {
 				fetchUser.setPhone(u.getPhone());
 				
 				user=u;
+
+				//to setup all other data if any changes were made to database schema at every login
+			    SessionFactoryBuilder.getUserSessionFactory();
 				
 				return VALID_USER;
 			}

@@ -1,3 +1,4 @@
+<%@page import="com.saptris.erp.SessionFactoryBuilder"%>
 <%@page import="com.saptris.erp.JspStream"%>
 <%@page import="com.saptris.erp.UserManager"%>
 <%@page import="com.saptris.erp.User"%>
@@ -10,6 +11,9 @@
 <title>ERP</title>
 </head>
 <body>
+
+<% SessionFactoryBuilder.setRealPath(getServletContext().getRealPath("")); %>
+
 <%@page session="false" %>
 <%
 	HttpSession session=null;
@@ -36,7 +40,7 @@
 	else if(status==UserManager.INVALID_USERNAME){
 		out.print("Not signed up yet, go to signup"+
 	"<br><a href=../signup>SignUp</a>");
-		response.sendRedirect("signup");
+		response.sendRedirect("../signup");
 	}
 	else if(status==UserManager.INVALID_PASSWORD){
 		out.print("Wrong password");

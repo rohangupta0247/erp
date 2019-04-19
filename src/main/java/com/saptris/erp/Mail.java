@@ -10,6 +10,10 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.hibernate.HibernateException;
+
+import com.sun.mail.util.MailConnectException;
+
 public class Mail{
 	final static public String emailAddress="saptristech@gmail.com";
 	final static private String password="Therise@9tech";
@@ -69,7 +73,12 @@ public class Mail{
 			*/
 			
 			//send mail
-			Transport.send(mail);
+			try {
+				Transport.send(mail);
+			}
+			catch(MailConnectException exc) {
+				throw new HibernateException("Problem connecting to Internet to send mail", exc);
+			}
 		/*}
 		catch(Exception e){
 			e.printStackTrace();

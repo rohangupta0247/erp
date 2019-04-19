@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
 
 @Entity
@@ -62,7 +63,7 @@ public class Vendors {
 	public Vendors() {
 	}
 
-	public Vendors(int vendor_id, String vendor_name, String address,
+	public Vendors(/*int vendor_id, */String vendor_name, String address,
 			int phone_number, int pincode, int fax_number, String website,
 			String email, String state, String vat_no, String liscence_no,
 			String mfg_lic_no, String vat_tin_no, String gst_in,
@@ -71,8 +72,8 @@ public class Vendors {
 			int liscence_no_expiry_date, int mfg_lic_no_expiry_date,
 			int vat_tin_no_expiry_date, int gstin_expiry_date,
 			int food_lic_no_expiry_date) {
-		super();
-		this.vendor_id = vendor_id;
+		//super();
+		//this.vendor_id = vendor_id;
 		this.vendor_name = vendor_name;
 		this.address = address;
 		this.phone_number = phone_number;
@@ -99,17 +100,17 @@ public class Vendors {
 	}
 
 	public String toString() {
-		return "Vendors{" + vendor_id + "replace" + vendor_name + "replace"
-				+ address + "replace" + phone_number + "replace" + pincode
-				+ "replace" + fax_number + "replace" + website + "replace"
-				+ email + "replace" + state + "replace" + vat_no + "replace"
-				+ liscence_no + "replace" + mfg_lic_no + "replace" + vat_tin_no
-				+ "replace" + gst_in + "replace" + food_lic_no + "replace"
-				+ business_type + "replace" + purchased + "replace"
-				+ payment_due + "replace" + vat_no_expiry_date + "replace"
-				+ liscence_no_expiry_date + "replace" + mfg_lic_no_expiry_date
-				+ "replace" + vat_tin_no_expiry_date + "replace"
-				+ gstin_expiry_date + "replace" + food_lic_no_expiry_date + "}";
+		return "Vendors{"+EntityManager.separator + vendor_id + EntityManager.separator + vendor_name + EntityManager.separator
+				+ address + EntityManager.separator + phone_number + EntityManager.separator + pincode
+				+ EntityManager.separator + fax_number + EntityManager.separator + website + EntityManager.separator
+				+ email + EntityManager.separator + state + EntityManager.separator + vat_no + EntityManager.separator
+				+ liscence_no + EntityManager.separator + mfg_lic_no + EntityManager.separator + vat_tin_no
+				+ EntityManager.separator + gst_in + EntityManager.separator + food_lic_no + EntityManager.separator
+				+ business_type + EntityManager.separator + purchased + EntityManager.separator
+				+ payment_due + EntityManager.separator + vat_no_expiry_date + EntityManager.separator
+				+ liscence_no_expiry_date + EntityManager.separator + mfg_lic_no_expiry_date
+				+ EntityManager.separator + vat_tin_no_expiry_date + EntityManager.separator
+				+ gstin_expiry_date + EntityManager.separator + food_lic_no_expiry_date +EntityManager.separator+ "}";
 	}
 
 	public int getVendor_id() {

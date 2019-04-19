@@ -1,0 +1,8 @@
+public String toString(){
+		if(t.d==this)
+			return "Demo{ "+i+", "+t.toStringWithoutRecursion()+" }";
+		return "Demo{ "+i+", "+t+" }";
+	}
+	public String toStringWithoutRecursion(){
+		return "Demo{ "+i+" }";
+	}

@@ -1,32 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
 <!-- Required meta tags -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<!-- Bootstrap CSS -->
-<!-- <link rel="stylesheet" href="bootstrap.min.css"> -->
-<link rel="stylesheet" type="text/css"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-<!-- <link rel="stylesheet" type="text/css" href="bootstrap.css"> -->
-
-<!-- Bootstrap CSS>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"-->
-
-
-<!-- Bootstrap 4 Modal-->
+<!-- link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"-->
+<!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"-->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
-<body>
+<body onload="loadTask()">
 
 <%@page import="com.saptris.erp.UserManager"%>
-<%@page session="false"%>
+<%@page session="false" isELIgnored="false"%>
 <%
 	HttpSession session= UserManager.getSession(request);
 	String from= request.getRequestURI()+"?"+request.getQueryString();
-	String loginRedirection= "../login?from="+from;
+	String loginRedirection= /*"../"+*/"login?from="+from;
 	if(session==null){
 		//redirection does not work in case of jsp:include
 		//response.sendRedirect(loginRedirection);
@@ -44,7 +37,7 @@
 		
 		<%}
 	else {
-		out.print(session.getAttribute("name")+"'s ERP"+"<br><a href=\"../logout\">Logout</a><br>");
+		//out.print(session.getAttribute("name")+"'s ERP"+"<br><a href=\"logout\">Logout</a><br>");
 	}
 %>
 
@@ -81,7 +74,7 @@
 	</div>
 
 	<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top" style="margin-bottom:25px;">
-		<a class="navbar-brand" href="#">Menu</a>
+		<a class="navbar-brand" href="#"><%=session.getAttribute("name") %></a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse"
 			data-target="#collapsibleNavbar">
 			<span class="navbar-toggler-icon"></span>
@@ -92,14 +85,15 @@
 			if(request.getRequestURI().endsWith("view"))
 				currentPage= "";
 			else
-				currentPage= "../view";
+				currentPage= "view";
 				%>
-				<li class="nav-item"><a class="nav-link"
-					href="<%= currentPage %>?query=Company">Company</a></li>
-				<li class="nav-item"><a class="nav-link"
-					href="<%= currentPage %>?query=Warehouse">Warehouse</a></li>
-				<li class="nav-item"><a class="nav-link"
-					href="<%= currentPage %>?query=Item">Inventory</a></li>
+				<li class="nav-item"><a class="nav-link" href="home">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Warehouse">Warehouse</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=ItemTemp">Item</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Vendors">Vendor</a></li>
+				<li class="nav-item"><a class="nav-link" href="save?query=MaintenanceAllUsers">Preventive-Maintenance</a></li>
+				<li class="nav-item"><a class="nav-link" href="logout">Logout</a></li>
+				
 			</ul>
 		</div>
 	</nav>

@@ -1,6 +1,8 @@
 package com.saptris.erp.db;
 
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +35,7 @@ public class ItemTemp {
 	@Attribute(index=5)
 	@Column(columnDefinition="int default 0")
 	private int hsn;
+	//private Map<String, String> map= new HashMap<>();
 	public int getItem_id() {
 		return item_id;
 	}
@@ -69,6 +72,12 @@ public class ItemTemp {
 	public void setArrival_date(Date arrival_date) {
 		this.arrival_date = arrival_date;
 	}
+	/*public Map<String, String> getMap() {
+		return map;
+	}
+	public void setMap(Map<String, String> map) {
+		this.map = map;
+	}*/
 	public ItemTemp() {}
 	
 	@Override
@@ -82,15 +91,24 @@ public class ItemTemp {
 	public void setHsn(int hsn) {
 		this.hsn = hsn;
 	}
-	public ItemTemp(int item_id, String item_name, Warehouse warehouse, int quantity, double cost, Date arrival_date,
+	public ItemTemp(String item_name, Warehouse warehouse, int quantity, double cost, Date arrival_date,
 			int hsn) {
-		this.item_id = item_id;
 		this.item_name = item_name;
 		this.warehouse = warehouse;
 		this.quantity = quantity;
 		this.cost = cost;
 		this.arrival_date = arrival_date;
 		this.hsn = hsn;
+	}
+	public ItemTemp(String item_name, Warehouse warehouse, int quantity, double cost, Date arrival_date,
+			int hsn, Map<String, String> map) {
+		this.item_name = item_name;
+		this.warehouse = warehouse;
+		this.quantity = quantity;
+		this.cost = cost;
+		this.arrival_date = arrival_date;
+		this.hsn = hsn;
+		//this.map = map;
 	}
 	
 	
