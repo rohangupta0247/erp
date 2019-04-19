@@ -21,6 +21,7 @@ public class SessionFactoryBuilder {
 	private static String realPath;
 	private static final String relativeClassPath= "WEB-INF"+File.separator+"classes"+File.separator;
 	private static final String[] entityPackages= {"com.saptris.erp.db","com.saptris.erp.db.hrm"};
+	private static final String[] globalentityPackages= {"com.saptris.erp"};
 	
 	public static HashMap<String, String> classesMapping= new HashMap<>();
 	
@@ -28,7 +29,26 @@ public class SessionFactoryBuilder {
 	public static SessionFactory getDefaultSessionFactory() throws HibernateException{
 		if(singletonObjectForUser==null) {
 			try {
-				singletonObjectForUser=new Configuration().configure("hibernateUser.cfg.xml").buildSessionFactory();
+				if(realPath==null)
+					throw new IllegalStateException("The real path of web application was not set, use \" <% SessionFactoryBuilder.setRealPath(getServletContext().getRealPath(\"\")); %> \" in servlet");
+				
+				//singletonObjectForUser=new Configuration().configure("hibernateUser.cfg.xml").buildSessionFactory();
+				Configuration cfg= new Configuration();
+
+				for(String pack: globalentityPackages) {
+					for(Class<?> c: SessionFactoryBuilder.getAllClasses(realPath+relativeClassPath , pack)) {
+						if(c.getAnnotation(Entity.class)!=null) {
+							cfg.addAnnotatedClass(c);
+							System.out.println(c);
+							classesMapping.put(c.getSimpleName(), pack+".");
+						}
+					}
+				}
+
+				//cfg.setPhysicalNamingStrategy(new UserNamePhysicalNamingStrategy());
+				//Configuration cfgNew= cfg.configure("hibernateUser.cfg.xml");
+				Configuration cfgNew= cfg.configure();
+				singletonObjectForUser=cfgNew.buildSessionFactory();
 			}			
 			catch(ServiceException e) {
 				throw e;
@@ -89,10 +109,11 @@ public class SessionFactoryBuilder {
 				
 				for(String pack: entityPackages) {
 					for(Class<?> c: SessionFactoryBuilder.getAllClasses(realPath+relativeClassPath , pack)) {
-						System.out.println(c);
-						if(c.getAnnotation(Entity.class)!=null)
+						if(c.getAnnotation(Entity.class)!=null) {
 							cfg.addAnnotatedClass(c);
-						classesMapping.put(c.getSimpleName(), pack+".");
+							System.out.println(c);
+							classesMapping.put(c.getSimpleName(), pack+".");
+						}
 					}
 				}
 					

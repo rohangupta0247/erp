@@ -20,7 +20,7 @@
   		<property name="hibernate.hbm2ddl.auto">update</property>
 		<!--property name="show_sql">true</property-->
 		
-        <mapping class="com.saptris.erp.User"/>
-        <mapping class="com.saptris.erp.MaintenanceAllUsers"/>
+        <!--mapping class="com.saptris.erp.User"/>
+        <mapping class="com.saptris.erp.MaintenanceAllUsers"/-->
     </session-factory>  
 </hibernate-configuration>

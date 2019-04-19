@@ -3,6 +3,8 @@ package com.saptris.erp.pmm;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.saptris.erp.SessionFactoryBuilder;
+
 public class ReminderServletContextListener implements ServletContextListener {
 
 	private ReminderScheduler reminderScheduler;
@@ -10,6 +12,7 @@ public class ReminderServletContextListener implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		System.out.println("Reminder Scheduler to start");
+		SessionFactoryBuilder.setRealPath(sce.getServletContext().getRealPath(""));
 		reminderScheduler= new ReminderScheduler();
 		reminderScheduler.start();
 	}
