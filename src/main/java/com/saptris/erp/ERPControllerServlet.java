@@ -58,7 +58,7 @@ public class ERPControllerServlet extends HttpServlet {
 		
 		switch (requestURI) {
 		case "favicon.ico":
-			dispatchURI= "image?image=favicon.ico";
+			downloadFavicon(response);
 			break;
 		case "home":
 			dispatchURI= "/index.jsp";
@@ -558,6 +558,45 @@ public class ERPControllerServlet extends HttpServlet {
 			throw new IllegalStateException("No image found in query string");
 		}
 		String imagePath= getServletContext().getRealPath("WEB-INF/classes/images/"+imageName);
+		
+		ServletOutputStream stream= null;
+		BufferedInputStream buf= null;
+		FileInputStream input= null;
+		try {
+			stream= response.getOutputStream();
+			File doc= new File(imagePath);
+			response.setContentType("image/jpeg");
+			response.addHeader("Content-Disposition", "attachment;filename="+imageName);
+			response.setContentLengthLong(doc.length());
+			
+			input= new FileInputStream(doc);
+			buf= new BufferedInputStream(input);
+			int readBytes=0;
+			while((readBytes=buf.read())!=-1) {
+				stream.write(readBytes);
+			}
+		} catch (Exception e) {
+			System.out.println("Error in downloading image");
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if(stream!=null) 
+					stream.close();
+				if(buf!=null) 
+					buf.close();
+				if(input!=null) 
+					input.close();
+			} catch (IOException e) {
+				System.out.println("Error in closing some resources while downloading");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void downloadFavicon(HttpServletResponse response) {
+		String imageName= "favicon.ico";
+		String imagePath= getServletContext().getRealPath("/"+imageName);
 		
 		ServletOutputStream stream= null;
 		BufferedInputStream buf= null;
