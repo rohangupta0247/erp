@@ -17,6 +17,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -38,6 +39,11 @@ public class ERPControllerServlet extends HttpServlet {
 		RequestDispatcher dispatcher = null;
 		String requestURI= request.getRequestURI();
 		//System.out.println("ERPControllerServlet was called by "+requestURI);
+		
+
+		//XXX heroku is not taking '=' in query string and converts it in ',' and then sends request
+		request= new HerokuRequest(request);
+		
 		String dispatchURI;
 		//dispatchURI=requestURI;
 		dispatchURI=noDispatch;
@@ -56,8 +62,9 @@ public class ERPControllerServlet extends HttpServlet {
 			break;
 		case "login":
 			String queryString= request.getQueryString();
-			if(queryString!=null)
+			if(queryString!=null) {
 				queryString="?"+queryString.replaceAll("&", "%26");
+			}
 			else
 				queryString="";
 			
@@ -581,6 +588,32 @@ public class ERPControllerServlet extends HttpServlet {
 				System.out.println("Error in closing some resources while downloading");
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private static class HerokuRequest extends HttpServletRequestWrapper{
+
+		public HerokuRequest(HttpServletRequest request) {
+			super(request);
+			//Auto-generated constructor stub
+		}
+		
+		@Override
+		public String getParameter(String name) {
+			//return super.getParameter(name);
+			String paramquery=getQueryString();
+			String params[]=paramquery.split("&");
+			for(String param:params) {
+				if(param.startsWith(name))
+					return param.split("=")[1];
+			}
+			return null;
+		}
+		
+		@Override
+		public String getQueryString() {
+			String query= super.getQueryString();
+			return (query==null)?null:query.replace(',', '=');
 		}
 	}
 }

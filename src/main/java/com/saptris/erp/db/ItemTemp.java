@@ -1,5 +1,6 @@
 package com.saptris.erp.db;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class ItemTemp {
 	@Attribute(index=2)
 	private int quantity;
 	@Attribute(index=3)
-	private double cost;
+	private BigDecimal cost;
 	@Attribute(index=4)
 	private Date arrival_date;
 	@Attribute(index=5)
@@ -59,10 +60,10 @@ public class ItemTemp {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public double getCost() {
+	public BigDecimal getCost() {
 		return cost;
 	}
-	public void setCost(double cost) {
+	public void setCost(BigDecimal cost) {
 		this.cost = cost;
 	}
 	public Date getArrival_date() {
@@ -90,7 +91,7 @@ public class ItemTemp {
 	public void setHsn(int hsn) {
 		this.hsn = hsn;
 	}
-	public ItemTemp(String item_name, Warehouse warehouse, int quantity, double cost, Date arrival_date,
+	public ItemTemp(String item_name, Warehouse warehouse, int quantity, BigDecimal cost, Date arrival_date,
 			int hsn) {
 		this.item_name = item_name;
 		this.warehouse = warehouse;
@@ -99,7 +100,7 @@ public class ItemTemp {
 		this.arrival_date = arrival_date;
 		this.hsn = hsn;
 	}
-	public ItemTemp(String item_name, Warehouse warehouse, int quantity, double cost, Date arrival_date,
+	public ItemTemp(String item_name, Warehouse warehouse, int quantity, BigDecimal cost, Date arrival_date,
 			int hsn, Map<String, String> map) {
 		this.item_name = item_name;
 		this.warehouse = warehouse;
