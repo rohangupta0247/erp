@@ -40,9 +40,10 @@ public class ERPControllerServlet extends HttpServlet {
 		String requestURI= request.getRequestURI();
 		//System.out.println("ERPControllerServlet was called by "+requestURI);
 		
-
+System.out.println("bef uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
 		//XXX heroku is not taking '=' in query string and converts it in ',' and then sends request
 		request= new HerokuRequest(request);
+System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
 		
 		String dispatchURI;
 		//dispatchURI=requestURI;
