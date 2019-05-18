@@ -46,7 +46,11 @@ public class TransactionalOperation {
 		}
 	}
 	
-	public static void delete(Object o) {
+	//TODO when fixed all constraints can this be removed ??
+	@SuppressWarnings("finally")
+	public static boolean delete(Object o) {
+		//TODO all constraints are handled in postgresql not in others
+		boolean status=true;
 		Session hbnSession = null;
 		try{
 			hbnSession = SessionFactoryBuilder.getUserSessionFactory().openSession();
@@ -57,11 +61,13 @@ public class TransactionalOperation {
 			txn.commit();
 		}
 		catch(Exception e){
+			status=false;
 			throw new HibernateException("Some unexpected error occured while deleting via TransactionalOpeartion", e);
 		}
 		finally{
 			if(hbnSession!=null)
 				hbnSession.close();
+			return status;
 		}
 	}
 }

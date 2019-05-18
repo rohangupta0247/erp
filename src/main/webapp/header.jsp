@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
-<body onload="loadTask()">
+<body>
 
 <%@page import="com.saptris.erp.UserManager"%>
 <%@page session="false" isELIgnored="false"%>
@@ -32,6 +32,7 @@
 		<script type="text/javascript">
     	$(window).on('load',function(){
     		$('#loginModal').modal({backdrop: 'static', keyboard: false}, 'show');
+    		location.reload();
     	});
 		</script>
 		
@@ -88,9 +89,11 @@
 				currentPage= "view";
 				%>
 				<li class="nav-item"><a class="nav-link" href="home">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Company">Company</a></li>
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Warehouse">Warehouse</a></li>
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=ItemTemp">Item</a></li>
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Vendors">Vendor</a></li>
+				<li class="nav-item"><a class="nav-link" href="payroll">Payroll</a></li>
 				<li class="nav-item"><a class="nav-link" href="save?query=MaintenanceAllUsers">Preventive-Maintenance</a></li>
 				<li class="nav-item"><a class="nav-link" href="logout">Logout</a></li>
 				

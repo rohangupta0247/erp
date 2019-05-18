@@ -14,23 +14,28 @@
 </head>
 <body>
 
+<%Boolean invalidUser= (Boolean)request.getAttribute("invalidUser"); %>
   
   <script type="text/javascript">
 window.onload=function() {
 	if(navigator.cookieEnabled==false){
-		document.getElementById("cookie-message").innerHTML="<h3>Cookies not enabled, please enable cookies first</h3>";
+		document.getElementById("show-message").innerHTML="<h3>Cookies not enabled, please enable cookies first</h3>";
 		//document.write("<h3>Cookies not enabled, please enable cookies first</h3>");
 		//document.close();
 	}
+	else{
+		if(<%= invalidUser%>)
+		document.getElementById("show-message").innerHTML="<h3>Wrong username or password</h3>";
+	}
 }
 </script>
-<div id="cookie-message"></div>
+<div class="text-center" id="show-message"></div>
   
   <div class="container">
   
   <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-->
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-->
-<%-- response.sendRedirect("login/welcome.jsp?"+request.getQueryString()+"&username=first&password=pass"); --%>
+<%-- response.sendRedirect("validateUser?"+request.getQueryString()+"&username=first&password=pass"); --%>
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-->
 <!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-->
   
@@ -39,7 +44,7 @@ window.onload=function() {
         <div class="card card-signin my-5">
           <div class="card-body">
             <h5 class="card-title text-center">Sign In</h5>
-            <form class="form-signin"  action="login/welcome.jsp?<%=/*"from="+request.getRequestURI()+"?"+*/request.getQueryString() %>" method="post">
+            <form class="form-signin"  action="validateUser?<%=/*"from="+request.getRequestURI()+"?"+*/request.getQueryString() %>" method="post">
               <div class="form-label-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="enter username here" required autofocus>

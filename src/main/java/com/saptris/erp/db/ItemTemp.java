@@ -1,7 +1,6 @@
 package com.saptris.erp.db;
 
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;

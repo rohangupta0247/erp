@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Target(FIELD)
 public @interface Attribute {
 	int index();
+	String[] values() default{};
 }

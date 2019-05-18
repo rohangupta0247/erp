@@ -38,9 +38,9 @@ try{
 EntityManager entityManager= new EntityManager(request.getParameter("query"));
 	try{
     	if(request.getParameter("status").equals("add"))
-			entityManager.saveRecord(request.getParameterMap(), EntityManager.ADD_RECORD);
+			entityManager.saveRecord(request.getParameterMap()/*, EntityManager.ADD_RECORD*/);
     	else if(request.getParameter("status").equals("update"))
-			entityManager.saveRecord(request.getParameterMap(), EntityManager.UPDATE_RECORD);
+			entityManager.saveRecord(request.getParameterMap()/*, EntityManager.UPDATE_RECORD*/);
 %>
 		saved
 <%  

@@ -42,9 +42,17 @@
 	</div>
 
 
-<h2 class="text-center">Some unexpected internal server error has occured !
-<img alt="ERROR 500: Internal Server Error" src="error500-image">
+<h2 class="text-center">Some unexpected internal server error has occured !<br>
+<img alt="ERROR 500: Internal Server Error" src="image?image=error500.jpg">
 </h2>
 
 <jsp:include page="footer.jsp" />
-<%/*exception.printStackTrace(); */%>
+<%
+try{
+	exception.printStackTrace();
+}
+catch(NullPointerException ex){
+	System.out.println("exception object was null in error page");
+}
+%>
+}

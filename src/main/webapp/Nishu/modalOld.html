@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+				<script language="javascript" type="text/javascript">
+					function myFunction() {
+						var no_of_attributes=5;
+						while(no_of_attributes){
+							document.getElementById('myId').innerHTML = document.getElementById('myId').innerHTML+"<tr><td>" + "attribute_name" + "</td><td>" + "attribute_value" + "</td></tr>";
+						no_of_attributes--;
+						}
+						
+					}
+				</script>
+  </head>
+  <body>
+ <div class="container">
+<br>
+<a data-toggle="modal" href="#myModal" class="btn btn-primary btn-lg" onclick="myFunction()">Click on table row to launch modal</a>
+
+<div class="modal fade" id="myModal">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+		<h4 class="modal-title">DETAILS</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      
+    </div>
+    <div class="modal-body">
+      <table>
+          <thead>
+          </thead>
+          <tbody class="table" id="myId">
+		  
+              
+					<tr>
+						<td id="attribute">nhishnt</td>  
+						<td id="attribute_value">adfgsdrhgsd</td>  
+					</tr>
+				  
+          </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</div>
+
+<!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  </body>
+</html>

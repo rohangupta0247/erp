@@ -20,7 +20,7 @@ public class SessionFactoryBuilder {
 	private static User savedUser;
 	private static String realPath;
 	private static final String relativeClassPath= "WEB-INF"+File.separator+"classes"+File.separator;
-	private static final String[] entityPackages= {"com.saptris.erp.db","com.saptris.erp.db.hrm"};
+	private static final String[] entityPackages= {"com.saptris.erp.db","com.saptris.erp.hrm.db"};
 	private static final String[] globalentityPackages= {"com.saptris.erp"};
 	
 	public static HashMap<String, String> classesMapping= new HashMap<>();
@@ -71,14 +71,14 @@ public class SessionFactoryBuilder {
 		}
 
 		public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment jdbcEnvironment) {
-			if(UserManager.user==null)
+			if(UserManager.getUser()==null)
 				return null;
 			
 			String nameOfTable= EntityManager.toUnderscoreCaseFromCamelCase(name.getText());
 			//if(nameOfTable.equals("maintenance_all_users") || nameOfTable.equals("user"))
 				//return Identifier.toIdentifier(nameOfTable);
 			
-			return Identifier.toIdentifier(UserManager.user.getUsername()+"_"+nameOfTable);
+			return Identifier.toIdentifier(UserManager.getUser().getUsername()+"_"+nameOfTable);
 		}
 
 		public Identifier toPhysicalSequenceName(Identifier name, JdbcEnvironment jdbcEnvironment) {
@@ -92,12 +92,12 @@ public class SessionFactoryBuilder {
 	}
 	
 	public static SessionFactory getUserSessionFactory() throws HibernateException{
-		if(UserManager.user==null)
+		if(UserManager.getUser()==null)
 			throw new HibernateException("Some unexpected error occured while building user based SessionFactory: User is null");
 		if(singletonObject!=null) {
 			//in case user's singelton SessionFactory was created but then some other user logins just after this
 			//then compare saved user with current user
-			if(savedUser!=UserManager.user)
+			if(savedUser!=UserManager.getUser())
 				singletonObject= null;
 		}
 		if(singletonObject==null) {
@@ -122,7 +122,7 @@ public class SessionFactoryBuilder {
 				Configuration cfgNew= cfg.configure();
 				singletonObject= cfgNew.buildSessionFactory();
 				//save user details for SessionFactory
-				savedUser= UserManager.user;
+				savedUser= UserManager.getUser();
 			}
 			catch(Exception e) {
 				throw new HibernateException("Some unexpected error occured while building user based SessionFactory",e);
@@ -132,6 +132,7 @@ public class SessionFactoryBuilder {
 	}
 	
 	public static void setRealPath(String realPathOfApplication) {
+		System.out.println("real path of application set to: "+realPathOfApplication);
 		realPath= realPathOfApplication;
 	}
 	

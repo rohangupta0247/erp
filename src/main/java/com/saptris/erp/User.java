@@ -16,6 +16,14 @@ public class User{
 	private String phone;
 	@Column(nullable=false)
 	private String pass;
+	@Column(nullable=false, columnDefinition="int default 0")
+	private int login_session;
+	public int getLogin_session() {
+		return login_session;
+	}
+	public void setLogin_session(int login_session) {
+		this.login_session= login_session;
+	}
 	
 	public User() {}
 	

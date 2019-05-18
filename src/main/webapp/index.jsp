@@ -59,9 +59,6 @@
 	</nav>
 
 
-<a href="view">View Company</a><br>
-<a href="payroll">Payroll</a><br>
-
 
 <style>
 body {
@@ -110,20 +107,33 @@ body {
 }
 </style>
 
-<h1>Card Flip with Text</h1>
-<h3>Hover over the image below:</h3>
-
 <div class="flip-card">
   <div class="flip-card-inner">
     <div class="flip-card-front">
-      <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="width:300px;height:300px;">
+      <img src="image?image=comapny-512x512.png" alt="Comapny" style="width:300px;height:300px;">
     </div>
     <div class="flip-card-back">
       <h1>Company</h1> 
       <p>Manage your company</p> 
       <p>Set all company related details</p>
       <div align="center">
-		<a href="view" class="btn btn-primary" style="margin-top:20px;" role="button">View Company</a>
+		<a href="view" class="btn btn-info" style="margin-top:20px;" role="button">View Company</a>
+	</div>
+    </div>
+  </div>
+</div>
+
+<div class="flip-card">
+  <div class="flip-card-inner">
+    <div class="flip-card-front">
+      <img src="image?image=payroll-800x800.png" alt="Payroll" style="width:300px;height:300px;">
+    </div>
+    <div class="flip-card-back">
+      <h1>Payroll</h1> 
+      <p>Manage your employees' salary</p> 
+      <p>Set all employee related details</p>
+      <div align="center">
+		<a href="payroll" class="btn btn-info" style="margin-top:20px;" role="button">Open Payroll</a>
 	</div>
     </div>
   </div>

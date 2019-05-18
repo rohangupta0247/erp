@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.saptris.erp.annotation.Attribute;
+import com.saptris.erp.hrm.PayrollModel;
 
 @WebServlet(name = "ERPControllerServlet", urlPatterns = "/")
 public class ERPControllerServlet extends HttpServlet {
@@ -25,22 +31,54 @@ public class ERPControllerServlet extends HttpServlet {
 	private static final long serialVersionUID = -3059936347418983129L;
 
 	private static final String noDispatch= "<no-dispatch>";
+	public static final String redirectionRequest="<redirect>:";
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RequestDispatcher dispatcher = null;
 		String requestURI= request.getRequestURI();
-		System.out.println("ERPControllerServlet was called by "+requestURI);
+		//System.out.println("ERPControllerServlet was called by "+requestURI);
 		String dispatchURI;
 		//dispatchURI=requestURI;
 		dispatchURI=noDispatch;
 		//-> /ERP/... so substring used
-		requestURI= requestURI.substring(5);
-		if(UserManager.isLoggedout())
-			requestURI="login";
+		int rootURLLength= "/ERP/".length();
+		requestURI= requestURI.substring(rootURLLength);
+		String tempRequest="";
+		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image")) {
+			tempRequest= requestURI;
+			requestURI= "login";
+		}
+		
 		switch (requestURI) {
+		case "home":
+			dispatchURI= "/index.jsp";
+			break;
 		case "login":
-			dispatchURI= "/login/index.jsp";
+			String queryString= request.getQueryString();
+			if(queryString!=null)
+				queryString="?"+queryString.replaceAll("&", "%26");
+			else
+				queryString="";
+			
+			//this is required for home page which directly calls login page
+			if(!tempRequest.equals("login")) {
+				tempRequest= request.getRequestURI();
+				if(tempRequest.endsWith("login")) {
+					// "/ERP/login"
+					//when login page is opened even when user logged in
+					tempRequest= "home";
+				}
+			}
+			else {
+				queryString="";
+				tempRequest="home";
+			}
+			
+			dispatchURI= "/login/index.jsp?from="+tempRequest+queryString;
+			break;
+		case "validateUser":
+			dispatchURI= validateUser(request, response);
 			break;
 		case "signup":
 			dispatchURI= "/signup/index.jsp";
@@ -59,29 +97,125 @@ public class ERPControllerServlet extends HttpServlet {
 			dispatchURI= "/view/index.jsp";
 			view(request, response);
 			break;
+		case "getEntityInJSArray":
+			//dispatchURI= noDispatch;
+			getEntityInJSArray(request, response);
+			break;
+		case "deleteEntity":
+			//dispatchURI= noDispatch;
+			deleteEntity(request, response);
+			break;
 		case "error":
 			dispatchURI= "error500.jsp";
 			break;
-		case "error500-image":
+		case "image":
 			//dispatchURI= noDispatch;
-			downloadError500Image(request, response);
+			downloadImage(request, response);
 			break;
 		case "payroll":
 			dispatchURI= "/payroll/index.jsp";
 			break;
-		case "payroll/save-employee":
-			dispatchURI= "/payroll/save.jsp";
+		case "save-employee":
+			dispatchURI= "/save/index.jsp";
+			save(request, response);
 			break;
-			
+		case "view-salary":
+			dispatchURI= "/view/index.jsp";
+			PayrollModel.viewSalary(request, response);
+			break;
+		case "generate-salary":
+			dispatchURI= "/save/index.jsp";
+			PayrollModel.generateSalary(request, response);
+			break;
+		case "pay-salary":
+			dispatchURI= PayrollModel.paySalary(request, response);
+			break;
+		case "payslip":
+			dispatchURI= "/payroll/payslip.jsp";
+			PayrollModel.paySlip(request, response);
+			break;
 		default:
 			System.out.println("No mapping done for "+requestURI);
+			dispatchURI= "error404.jsp";
 		}
-		if(dispatchURI.equals(noDispatch))
+		if(dispatchURI.equals(noDispatch)) {
+			//response.sendRedirect(requestURI);
 			return;
+		}
+		else if(dispatchURI.startsWith(redirectionRequest)) {
+			dispatchURI= dispatchURI.substring(redirectionRequest.length());
+			//response.sendRedirect(redirectURI);
+			response.getWriter().print("<script>\r\n" + 
+					"	window.location.replace('"+dispatchURI+"');\r\n" + 
+					"</script>");
+			return;
+		}
 		dispatcher= request.getRequestDispatcher(dispatchURI);
-		dispatcher.forward(request, response);
+		try {
+			dispatcher.forward(request, response);
+		}
+		catch(IllegalStateException ex) {
+			if(ex.getMessage().equals("Cannot forward after response has been committed")) {
+				System.out.println("response was committed");
+			}
+			else {
+				throw ex;
+			}
+		}
 	}
 	
+	private String validateUser(HttpServletRequest request, HttpServletResponse response) {
+		//no need now on context loading path is set
+		//SessionFactoryBuilder.setRealPath(getServletContext().getRealPath(""));
+		
+		HttpSession session= request.getSession();
+		String username= request.getParameter("username");
+		String password= request.getParameter("password");
+		try{
+		User u=new User();
+		int status= UserManager.validateLogin(username, password,u,session.hashCode());
+
+		switch (status) {
+		case UserManager.VALID_USER:
+			//session= request.getSession();
+			session.setAttribute("username", u.getUsername());
+			session.setAttribute("name", u.getName());
+			session.setAttribute("email", u.getEmail());
+			session.setAttribute("pass", u.getPass());
+			
+			//out.print("Welcome "+session.getAttribute("name").toString());
+			
+			String from= request.getParameter("from");
+			if(from==null)
+				//from="../";
+				from="home";
+			//response.sendRedirect(from);
+			return redirectionRequest+from;
+		//break;
+		case UserManager.INVALID_USERNAME:
+			session.invalidate();
+			//out.print("Not signed up yet, go to signup<br><a href=../signup>SignUp</a>");
+			//response.sendRedirect("../signup");
+			return redirectionRequest+"signup";
+		//break;
+		case UserManager.INVALID_PASSWORD:
+			session.invalidate();
+			//out.print("Wrong password");
+			request.setAttribute("invalidUser",true);
+			return "login";
+			//break;
+		default:
+			throw new IllegalStateException("Invalid status value from UserManager.validateLogin()");
+			//break;
+		}
+		}
+	    catch(Exception e){
+	    	session.invalidate();
+	    	//JspStream.printException(e,out);
+	    	e.printStackTrace();
+	    	return "error";
+	    }
+	}
 	
 	private void view(HttpServletRequest request, HttpServletResponse response) {
 		// number of records to display per page
@@ -169,6 +303,7 @@ public class ERPControllerServlet extends HttpServlet {
 		String columns[] = (String[])request.getAttribute("columns");
 		String columnstoNamingCase[] = (String[])request.getAttribute("columnstoNamingCase");
 		String row[][] = (String[][])request.getAttribute("row");
+		String addAction = (String)request.getAttribute("addAction");
 		 */
 		
 		request.setAttribute("query", query);
@@ -182,6 +317,9 @@ public class ERPControllerServlet extends HttpServlet {
 		request.setAttribute("columns", columns);
 		request.setAttribute("columnstoNamingCase", columnstoNamingCase);
 		request.setAttribute("row", row);
+		request.setAttribute("idSeparator", EntityManager.idSeparator);
+		String addAction = "save";
+		request.setAttribute("addAction", addAction);
 	}
 	
 	private void save(HttpServletRequest request, HttpServletResponse response) {
@@ -190,6 +328,7 @@ public class ERPControllerServlet extends HttpServlet {
 		//same format used in javascript
 		String dateFormat="YYYY-MM-DD";
 		String datetimeFormat="YYYY-MM-DD/hh:mm am/pm";
+		String monthFormat="YYYY-MM";
 		
 		String query= request.getParameter("query");
 		String status= request.getParameter("status");
@@ -221,7 +360,7 @@ public class ERPControllerServlet extends HttpServlet {
 			attributestoRunningSpaceCase[i++]= EntityManager.toRunningSpaceCase(stri);
 		}
 		
-		Map<String, Map<String,String>> dynamicDropdown= dynamicDropdown(attributes, types);
+		Map<String, Map<String,String>> dynamicDropdown= dynamicDropdown(entityManager, attributes, types);
 		
 		/*
 		String query= (String)request.getAttribute("query");
@@ -236,31 +375,41 @@ public class ERPControllerServlet extends HttpServlet {
 		String types[]= (String[])request.getAttribute("types");
 		Boolean nullable[]= (Boolean[])request.getAttribute("nullable");
 		Map<String, Map<String,String>> dynamicDropdown= (Map<String, Map<String,String>>)request.getAttribute("dynamicDropdown");
+		String formAction = (String)request.getAttribute("formAction");
 		*/
 		request.setAttribute("query", query);
 		request.setAttribute("querytoNamingCaseFromCamelCase", querytoNamingCaseFromCamelCase);
 		request.setAttribute("status", status);
 		request.setAttribute("dateFormat", dateFormat);
 		request.setAttribute("datetimeFormat", datetimeFormat);
+		request.setAttribute("monthFormat", monthFormat);
 		request.setAttribute("attributes", attributes);
 		request.setAttribute("attributestoNamingCase", attributestoNamingCase);
 		request.setAttribute("attributestoRunningCase", attributestoRunningCase);
 		request.setAttribute("attributestoRunningSpaceCase", attributestoRunningSpaceCase);
 		request.setAttribute("types", types);
 		request.setAttribute("nullable", nullable);
+		request.setAttribute("idSeparator", EntityManager.idSeparator);
 		request.setAttribute("dynamicDropdown", dynamicDropdown);
+		if(status.equals("update")) {
+			String id= request.getParameter("id");
+			request.setAttribute("id", id);
+		}
+		String formAction= "saveRecord";
+		request.setAttribute("formAction", formAction);
 	}
 	
-	private Map<String, Map<String,String>> dynamicDropdown(String []attributes, String []types){
+	public static Map<String, Map<String,String>> dynamicDropdown(EntityManager entityManager, String []attributes, String []types){
 		Map<String, Map<String,String>> result= new HashMap<>();
-		Map<String,String> temp= new TreeMap<>();
 		String selectKey, optionValuetoRunningCase, optionShow;
 		int i=0;
 		//in case of select, attribute name will be variable name of attribute class in the entity class
 		for(i=0;i<types.length;i++) {
-			if(types[i].equals("select")) {
-				selectKey= attributes[i];
-				EntityManager foreignEntity= new EntityManager(EntityManager.toNamingCase(attributes[i])/*.split(" ")[0]*/);
+			Map<String,String> temp= new TreeMap<>();
+			selectKey= attributes[i];
+			
+			if(types[i].equals("select") || types[i].equals("add-more")) {
+				EntityManager foreignEntity= new EntityManager(EntityManager.toCamelCase(attributes[i])/*.split(" ")[0]*/);
 				List<?> foreignValues= foreignEntity.getAllEntity();
 				for(int j=0;j<foreignValues.size();j++){
 					//store id of entity in "value" and complete detail in inner text
@@ -269,26 +418,46 @@ public class ERPControllerServlet extends HttpServlet {
 							 " " +foreignValues.get(j).toString().split(EntityManager.separator)[2];
 					temp.put(optionValuetoRunningCase, optionShow);
 				}
-				result.put(selectKey, temp);
 			}
+			else if(types[i].equals("options")) {
+				try {
+					Field field = entityManager.getClassType().getDeclaredField(selectKey);
+					Attribute attr= field.getAnnotation(Attribute.class);
+					String[] foreignValues= attr.values();
+					
+					
+					for(int j=0;j<foreignValues.length;j++){
+						//store string in "value" and in inner text
+						optionShow= optionValuetoRunningCase= foreignValues[j];
+						temp.put(optionValuetoRunningCase, optionShow);
+					}
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Some unexpected error occured while setting options");
+				}
+			}
+			result.put(selectKey, temp);
 		}
 		return result;
 	}
 	
+	
 	private String saveRecord(HttpServletRequest request, HttpServletResponse response) {
 		EntityManager entityManager= new EntityManager(request.getParameter("query"));
 		try{
-			if(request.getParameter("status").equals("add"))
+			/*if(request.getParameter("status").equals("add"))
 				entityManager.saveRecord(request.getParameterMap(), EntityManager.ADD_RECORD);
 			else if(request.getParameter("status").equals("update"))
-				entityManager.saveRecord(request.getParameterMap(), EntityManager.UPDATE_RECORD);
+				entityManager.saveRecord(request.getParameterMap(), EntityManager.UPDATE_RECORD);*/
+			entityManager.saveRecord(request.getParameterMap());
 
 			if(request.getParameter("query").equals("MaintenanceAllUsers"))
 				//response.sendRedirect("../");
-				return "home";
+				return redirectionRequest+"home";
 			else
 				//response.sendRedirect("../view?query="+request.getParameter("query"));
-				return "view?query="+request.getParameter("query");
+				return redirectionRequest+"view?query="+request.getParameter("query");
 		}
 		catch(Exception e){
 			//JspStream.printException(e,response.getWriter());
@@ -300,8 +469,84 @@ public class ERPControllerServlet extends HttpServlet {
 		//		</script>
 	}
 	
-	private void downloadError500Image(HttpServletRequest request, HttpServletResponse response) {
-		String imageName= "error500.jpg";
+	private void getEntityInJSArray(HttpServletRequest request, HttpServletResponse response) {
+		String query= request.getParameter("query");
+		if(query==null) {
+			throw new IllegalStateException("No query found in query string");
+		}
+		String idString= request.getParameter("id");
+		if(idString==null) {
+			throw new IllegalStateException("No id found in query string");
+		}
+		
+		try {
+			PrintWriter out= response.getWriter();
+			//response.setContentType("text/html");
+			response.setContentType("application/json");
+			out.print(entityInJSArray(query, idString));
+		} catch (IOException e) {
+			System.out.println("Some error while getting entity");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private String entityInJSArray(String query, String idString) {
+		//TODO id in long
+		int id= Integer.parseInt(idString); 
+		EntityManager em= new EntityManager(query);
+		
+		String res[]= EntityManager.mapObject(em.getEntity(id));
+		String cols[]= em.getAttributesName();
+		String colsNaming[]= new String[cols.length];
+		int i=0;
+		for(String temp: cols)
+			colsNaming[i++]=EntityManager.toNamingCase(temp);
+		String s="{\"entity\":[\""+res[0]+"\"";
+		for(i=1;i<res.length;i++) {
+			if(!res[i].startsWith("["))
+				s+=", \""+res[i]+"\"";
+			else
+				s+=", "+res[i];
+		}
+		s+="], \"attrs\":[\"ID\"";
+		for(i=0;i<colsNaming.length;i++) {
+			s+=", \""+colsNaming[i]+"\"";
+		}
+		s+="]}";
+		return s;
+	}
+	
+	private void deleteEntity(HttpServletRequest request, HttpServletResponse response) {
+		String query= request.getParameter("query");
+		if(query==null) {
+			throw new IllegalStateException("No query found in query string");
+		}
+		String idString= request.getParameter("id");
+		if(idString==null) {
+			throw new IllegalStateException("No id found in query string");
+		}
+		
+		try {
+			PrintWriter out= response.getWriter();
+			//response.setContentType("text/html");
+			response.setContentType("application/json");
+			
+			//TODO long
+			int id= Integer.parseInt(idString);
+			out.print("{\"deleted\":"+new EntityManager(query).delete(id)+"}"); 
+		} catch (IOException e) {
+			System.out.println("Some error while deleting entity");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void downloadImage(HttpServletRequest request, HttpServletResponse response) {
+		String imageName= request.getParameter("image");
+		if(imageName==null) {
+			throw new IllegalStateException("No image found in query string");
+		}
 		String imagePath= getServletContext().getRealPath("WEB-INF/classes/images/"+imageName);
 		
 		ServletOutputStream stream= null;
@@ -321,7 +566,7 @@ public class ERPControllerServlet extends HttpServlet {
 				stream.write(readBytes);
 			}
 		} catch (Exception e) {
-			System.out.println("Error in downloading error500 image");
+			System.out.println("Error in downloading image");
 			e.printStackTrace();
 		}
 		finally {
