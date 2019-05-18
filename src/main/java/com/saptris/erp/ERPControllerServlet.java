@@ -54,11 +54,14 @@ public class ERPControllerServlet extends HttpServlet {
 		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") && !requestURI.equals("favicon.ico")) {
 			tempRequest= requestURI;
 			requestURI= "login";
+			System.out.println("in case");
 		}
 		
 		switch (requestURI) {
 		case "favicon.ico":
+			System.out.println("gonna download");
 			downloadFavicon(response);
+			System.out.println("downloaded");
 			break;
 		case "home":
 			dispatchURI= "/index.jsp";
