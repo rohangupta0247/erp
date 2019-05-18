@@ -17,7 +17,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -40,10 +39,10 @@ public class ERPControllerServlet extends HttpServlet {
 		String requestURI= request.getRequestURI();
 		//System.out.println("ERPControllerServlet was called by "+requestURI);
 		
-System.out.println("bef uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
-		//XXX heroku is not taking '=' in query string and converts it in ',' and then sends request
-		request= new HerokuRequest(request);
-System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
+//System.out.println("bef uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
+		//fixed heroku is not taking '=' in query string and converts it in ',' and then sends request
+		//request= new HerokuRequest(request);
+//System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
 		
 		String dispatchURI;
 		//dispatchURI=requestURI;
@@ -52,12 +51,15 @@ System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryS
 		int rootURLLength= "/ERP/".length();
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
-		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image")) {
+		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") && !requestURI.equals("favicon.ico")) {
 			tempRequest= requestURI;
 			requestURI= "login";
 		}
 		
 		switch (requestURI) {
+		case "favicon.ico":
+			dispatchURI= "image?image=favicon.ico";
+			break;
 		case "home":
 			dispatchURI= "/index.jsp";
 			break;
@@ -592,6 +594,7 @@ System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryS
 		}
 	}
 	
+	/*
 	private static class HerokuRequest extends HttpServletRequestWrapper{
 
 		public HerokuRequest(HttpServletRequest request) {
@@ -616,5 +619,5 @@ System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryS
 			String query= super.getQueryString();
 			return (query==null)?null:query.replace(',', '=');
 		}
-	}
+	}*/
 }
