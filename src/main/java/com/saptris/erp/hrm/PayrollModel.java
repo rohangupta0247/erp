@@ -224,7 +224,6 @@ public class PayrollModel {
 		int empId= Integer.parseInt(empIdString);
 
 		try {
-			/**/System.out.println("in try");
 			EntityManager ememp= new EntityManager("Employee");
 			Employee emp= (Employee)ememp.getEntity(empId);
 
@@ -285,7 +284,6 @@ public class PayrollModel {
 			}
 			BigDecimal netBasic= new BigDecimal(present).multiply(grossBasic).divide(new BigDecimal(nowd),scaleForDecimal, roundingMode);
 			ratesMap.put(basicPayhead, netBasic);
-			/**/System.out.println("net basic: "+netBasic);
 
 			Map<Payhead, BigDecimal> amtMap= new HashMap<>();
 			Set<Payhead> tempset= ratesMap.keySet();
@@ -293,10 +291,12 @@ public class PayrollModel {
 			while(tempset.size()!=0){
 				Set<Payhead> tempsetcopy= new HashSet<>();
 				tempsetcopy.addAll(tempset);
+				/**/System.out.println("tempsetcopy: "+tempsetcopy);
 				for(Payhead pay: tempsetcopy) {
 					if(pay.getPayhead()==null||pay.getPayhead().size()==0) {
 						amtMap.put(pay, ratesMap.get(pay));
 						tempset.remove(pay);
+						/**/System.out.println("added "+pay.getPayhead_name());
 					}
 					else {
 						BigDecimal bgtemp=null, bgtotal= new BigDecimal("0.0");
@@ -313,6 +313,7 @@ public class PayrollModel {
 						if(!flag) {
 							amtMap.put(pay, ratesMap.get(pay).multiply(bgtotal).divide(new BigDecimal("100.00"), scaleForDecimal, roundingMode));
 							tempset.remove(pay);
+							/**/System.out.println("added "+pay.getPayhead_name());
 						}
 					}
 				}
@@ -353,7 +354,6 @@ public class PayrollModel {
 			paramMap.put("payment-breakup", new String[]{...});
 			emsp.saveRecord(paramMap);*/
 
-			/**/System.out.println("done all");
 			return ERPControllerServlet.redirectionRequest+"view-salary";
 		} catch (Exception e) {
 			System.out.println("Some error while testing");
