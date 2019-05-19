@@ -47,23 +47,25 @@ public class ERPControllerServlet extends HttpServlet {
 		String dispatchURI;
 		//dispatchURI=requestURI;
 		dispatchURI=noDispatch;
-		//-> /ERP/... so substring used
-		int rootURLLength= "/ERP/".length();
+		//-> in localhost-> /ERP/... so substring used
+		//int rootURLLength= "/ERP/".length();
+		//after deploying -> site has no root
+		int rootURLLength= 0;
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
-		System.out.println("requestURI: "+requestURI);
-		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") && !requestURI.equals("favicon.ico")) {
+		//System.out.println("requestURI: "+requestURI);
+		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") /*&& !requestURI.equals("favicon.ico")*/) {
 			tempRequest= requestURI;
 			requestURI= "login";
-			System.out.println("in case");
+			//System.out.println("in case");
 		}
 		
 		switch (requestURI) {
-		case "favicon.ico":
-			System.out.println("gonna download");
+		/*case "favicon.ico":
+			//System.out.println("gonna download");
 			downloadFavicon(response);
-			System.out.println("downloaded");
-			break;
+			//System.out.println("downloaded");
+			break;*/
 		case "home":
 			dispatchURI= "/index.jsp";
 			break;
@@ -598,7 +600,7 @@ public class ERPControllerServlet extends HttpServlet {
 		}
 	}
 	
-	private void downloadFavicon(HttpServletResponse response) {
+	/*private void downloadFavicon(HttpServletResponse response) {
 		String imageName= "favicon.ico";
 		String imagePath= getServletContext().getRealPath("/"+imageName);
 		
@@ -635,7 +637,7 @@ public class ERPControllerServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 	
 	/*
 	private static class HerokuRequest extends HttpServletRequestWrapper{
