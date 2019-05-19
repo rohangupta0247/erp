@@ -53,7 +53,7 @@ public class ERPControllerServlet extends HttpServlet {
 		int rootURLLength= 0;
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
-		//System.out.println("requestURI: "+requestURI);
+		System.out.println("requestURI: "+requestURI);
 		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") && !requestURI.equals("favicon.ico")) {
 			tempRequest= requestURI;
 			requestURI= "login";
