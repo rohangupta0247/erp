@@ -37,12 +37,6 @@ public class ERPControllerServlet extends HttpServlet {
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		RequestDispatcher dispatcher = null;
 		String requestURI= request.getRequestURI();
-		//System.out.println("ERPControllerServlet was called by "+requestURI);
-		
-//System.out.println("bef uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
-		//fixed heroku is not taking '=' in query string and converts it in ',' and then sends request
-		//request= new HerokuRequest(request);
-//System.out.println("aft uri: "+request.getRequestURI()+" qs: "+request.getQueryString());
 		
 		String dispatchURI;
 		//dispatchURI=requestURI;
@@ -53,7 +47,7 @@ public class ERPControllerServlet extends HttpServlet {
 		int rootURLLength= "/".length();
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
-		System.out.println("requestURI: "+requestURI);
+		//deployments have a favicon.ico call for every request
 		if(UserManager.isLoggedout() && !requestURI.equals("home") && !requestURI.equals("validateUser") && !requestURI.equals("signup") && !requestURI.equals("image") && !requestURI.equals("favicon.ico")) {
 			tempRequest= requestURI;
 			requestURI= "login";
@@ -635,31 +629,4 @@ public class ERPControllerServlet extends HttpServlet {
 			}
 		}
 	}
-	
-	/*
-	private static class HerokuRequest extends HttpServletRequestWrapper{
-
-		public HerokuRequest(HttpServletRequest request) {
-			super(request);
-			//Auto-generated constructor stub
-		}
-		
-		@Override
-		public String getParameter(String name) {
-			//return super.getParameter(name);
-			String paramquery=getQueryString();
-			String params[]=paramquery.split("&");
-			for(String param:params) {
-				if(param.startsWith(name))
-					return param.split("=")[1];
-			}
-			return null;
-		}
-		
-		@Override
-		public String getQueryString() {
-			String query= super.getQueryString();
-			return (query==null)?null:query.replace(',', '=');
-		}
-	}*/
 }
