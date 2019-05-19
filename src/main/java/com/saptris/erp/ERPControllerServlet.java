@@ -49,8 +49,8 @@ public class ERPControllerServlet extends HttpServlet {
 		dispatchURI=noDispatch;
 		//-> in localhost-> /ERP/... so substring used
 		//int rootURLLength= "/ERP/".length();
-		//after deploying -> site has no root
-		int rootURLLength= 0;
+		//after deploying -> site has "/" root
+		int rootURLLength= "/".length();
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
 		System.out.println("requestURI: "+requestURI);
