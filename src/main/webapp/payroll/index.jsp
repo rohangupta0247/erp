@@ -37,7 +37,7 @@ int numberOfRecords= entityManager.getCount();
 	<a href="view?query=MonthlyDetail" class="btn btn-primary" style="margin-top:20px;" role="button">Monthly Employee Work and Details</a><br>
 	<a href="view?query=MonthWorkingDays" class="btn btn-primary" style="margin-top:20px;" role="button">Number of working days</a><br>
 	<a href="view-salary" class="btn btn-primary" style="margin-top:20px;" role="button">View Salary</a><br>
-	<a href="payslip" class="btn btn-primary" style="margin-top:20px;" role="button">View Pay Slip</a><br>
+	<a href="select-employee" class="btn btn-primary" style="margin-top:20px;" role="button">View Pay Slip</a><br>
 	<!--a href="#" class="btn btn-primary" style="margin-top:20px;" role="button">*****Set Category Rates</a><br-->
 	
 	</div>

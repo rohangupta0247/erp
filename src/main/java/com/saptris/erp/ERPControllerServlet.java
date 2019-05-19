@@ -25,6 +25,12 @@ import com.saptris.erp.hrm.PayrollModel;
 
 @WebServlet(name = "ERPControllerServlet", urlPatterns = "/")
 public class ERPControllerServlet extends HttpServlet {
+	//-> in localhost-> /ERP/... so substring used
+	//private int rootURLLength= "/ERP/".length();
+	//after deploying -> site has "/" root
+	private int rootURLLength= "/".length();
+	
+	
 	/**
 	 * 
 	 */
@@ -41,10 +47,6 @@ public class ERPControllerServlet extends HttpServlet {
 		String dispatchURI;
 		//dispatchURI=requestURI;
 		dispatchURI=noDispatch;
-		//-> in localhost-> /ERP/... so substring used
-		//int rootURLLength= "/ERP/".length();
-		//after deploying -> site has "/" root
-		int rootURLLength= "/".length();
 		requestURI= requestURI.substring(rootURLLength);
 		String tempRequest="";
 		//deployments have a favicon.ico call for every request
@@ -136,6 +138,10 @@ public class ERPControllerServlet extends HttpServlet {
 			break;
 		case "pay-salary":
 			dispatchURI= PayrollModel.paySalary(request, response);
+			break;
+		case "select-employee":
+			dispatchURI= "/save/index.jsp";
+			PayrollModel.selectEmployee(request, response);
 			break;
 		case "payslip":
 			dispatchURI= "/payroll/payslip.jsp";

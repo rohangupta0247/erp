@@ -7,6 +7,10 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  </head>
+  <body>
+
+
 <style>
 @media print {
 body {-webkit-print-color-adjust: exact;}
@@ -42,8 +46,6 @@ WinPrint.close();
 }
 </script>
 
-  </head>
-  <body>
     <div class="container">
 <button id='print-button' onclick='printPage()'>Print</button>
 <br>

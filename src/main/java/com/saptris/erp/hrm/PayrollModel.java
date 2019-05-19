@@ -213,6 +213,88 @@ public class PayrollModel {
 		request.setAttribute("formAction", formAction);
 	}
 	
+	public static void selectEmployee(HttpServletRequest request, HttpServletResponse response) {
+		String []attributes, types;
+		Boolean []nullable;
+		//same format used in javascript
+		String dateFormat="YYYY-MM-DD";
+		String datetimeFormat="YYYY-MM-DD/hh:mm am/pm";
+		String monthFormat="YYYY-MM";
+		
+		String query= request.getParameter("query");
+		String status= request.getParameter("status");
+		if(query==null || query.equals("null"))
+			query= "SalaryPayment";
+		if(status==null || status.equals("null"))
+			status= "add";
+		
+		String querytoNamingCaseFromCamelCase= EntityManager.toNamingCaseFromCamelCase(query);
+		
+		EntityManager entityManager= new EntityManager(query);
+		attributes= entityManager.getAttributesName();
+		//excluse total and payment_breakup
+		attributes= Arrays.copyOf(attributes, attributes.length-2);
+		types= entityManager.getAttributesType();
+		//excluse total(bigdecimal) and payment_breakup(map) is by defualt not included
+		types= Arrays.copyOf(types, types.length-1);
+		nullable= entityManager.getAttributesNullability();
+		nullable= Arrays.copyOf(nullable, nullable.length-1);
+		
+		String [] attributestoNamingCase= new String[attributes.length];
+		int i=0;
+		for(String stri: attributes) {
+			attributestoNamingCase[i++]= EntityManager.toNamingCase(stri);
+		}
+		String [] attributestoRunningCase= new String[attributes.length];
+		i=0;
+		for(String stri: attributes) {
+			attributestoRunningCase[i++]= EntityManager.toRunningCase(stri);
+		}
+		String [] attributestoRunningSpaceCase= new String[attributes.length];
+		i=0;
+		for(String stri: attributes) {
+			attributestoRunningSpaceCase[i++]= EntityManager.toRunningSpaceCase(stri);
+		}
+		
+		Map<String, Map<String,String>> dynamicDropdown= ERPControllerServlet.dynamicDropdown(entityManager, attributes, types);
+		
+		/*
+		String query= (String)request.getAttribute("query");
+		String querytoNamingCaseFromCamelCase= (String)request.getAttribute("querytoNamingCaseFromCamelCase");
+		String status= (String)request.getAttribute("status");
+		String dateFormat= (String)request.getAttribute("dateFormat");
+		String datetimeFormat= (String)request.getAttribute("datetimeFormat");
+		String attributes[]= (String[])request.getAttribute("attributes");
+		String attributestoNamingCase[]= (String[])request.getAttribute("attributestoNamingCase");
+		String attributestoRunningCase[]= (String[])request.getAttribute("attributestoRunningCase");
+		String attributestoRunningSpaceCase[]= (String[])request.getAttribute("attributestoRunningSpaceCase");
+		String types[]= (String[])request.getAttribute("types");
+		Boolean nullable[]= (Boolean[])request.getAttribute("nullable");
+		Map<String, Map<String,String>> dynamicDropdown= (Map<String, Map<String,String>>)request.getAttribute("dynamicDropdown");
+		String formAction = (String)request.getAttribute("formAction");
+		 */
+		request.setAttribute("query", query);
+		request.setAttribute("querytoNamingCaseFromCamelCase", querytoNamingCaseFromCamelCase);
+		request.setAttribute("status", status);
+		request.setAttribute("dateFormat", dateFormat);
+		request.setAttribute("datetimeFormat", datetimeFormat);
+		request.setAttribute("monthFormat", monthFormat);
+		request.setAttribute("attributes", attributes);
+		request.setAttribute("attributestoNamingCase", attributestoNamingCase);
+		request.setAttribute("attributestoRunningCase", attributestoRunningCase);
+		request.setAttribute("attributestoRunningSpaceCase", attributestoRunningSpaceCase);
+		request.setAttribute("types", types);
+		request.setAttribute("nullable", nullable);
+		request.setAttribute("idSeparator", EntityManager.idSeparator);
+		request.setAttribute("dynamicDropdown", dynamicDropdown);
+		if(status.equals("update")) {
+			String id= request.getParameter("id");
+			request.setAttribute("id", id);
+		}
+		String formAction= "payslip";
+		request.setAttribute("formAction", formAction);
+	}
+	
 	public static String paySalary(HttpServletRequest request, HttpServletResponse response) {
 		String empIdString= request.getParameter("employee");
 		String monthString= request.getParameter("month");
@@ -352,7 +434,7 @@ public class PayrollModel {
 
 			return ERPControllerServlet.redirectionRequest+"view-salary";
 		} catch (Exception e) {
-			System.out.println("Some error while testing");
+			System.out.println("Some error while calculating salary");
 			e.printStackTrace();
 			return "error";
 		}
@@ -360,6 +442,60 @@ public class PayrollModel {
 	}
 
 	public static void paySlip(HttpServletRequest request, HttpServletResponse response) {
+		String empIdString= request.getParameter("employee");
+		String monthString= request.getParameter("month");
+		if(empIdString==null || empIdString.equals("") || monthString==null || monthString.equals(""))
+			throw new IllegalArgumentException("Wrong arguments for payslip: "+empIdString+" & "+monthString);
+		//TODO long
+		int empId= Integer.parseInt(empIdString);
 
+		try {
+			EntityManager ememp= new EntityManager("Employee");
+			Employee emp= (Employee)ememp.getEntity(empId);
+
+			List<?> list;
+
+			Map<String, Object> attrs= new HashMap<>();
+			attrs.put("employee", emp);
+			Date date= Date.valueOf(monthString+"-01");
+			attrs.put("month", date);
+			
+			EntityManager emsp= new EntityManager("SalaryPayment");
+			list= emsp.getEntityFor(attrs);
+			
+			SalaryPayment salary= (SalaryPayment) list.get(0);
+			
+			EntityManager emmd= new EntityManager("MonthlyDetail");
+			list= emmd.getEntityFor(attrs);
+			int present=-1, nowd=-1;
+			MonthlyDetail md= (MonthlyDetail)list.get(0);
+			present= md.getPresent();
+			
+			EntityManager emmwd= new EntityManager("MonthWorkingDays");
+			list= emmwd.getEntityFor("month", date);
+			
+			MonthWorkingDays mwf= (MonthWorkingDays)list.get(0);
+				nowd= mwf.getNumber_of_working_days();
+			
+			if(present==-1 || nowd==-1) {
+				throw new IllegalStateException("No present or number of working days was set");
+			}
+			
+			/*
+			boolean searchStatus= (Boolean)request.getAttribute("searchStatus");
+			SalaryPayment salary= (SalaryPayment)request.getAttribute("salary");
+			int nowd= (Integer)request.getAttribute("nowd");
+			int present= (Integer)request.getAttribute("present");
+			*/
+			request.setAttribute("salary", salary);
+			request.setAttribute("nowd", nowd);
+			request.setAttribute("present", present);
+			request.setAttribute("searchStatus", true);
+			
+		} catch (Exception e) {
+			request.setAttribute("searchStatus", false);
+			System.out.println("Some error while generating payslip");
+			e.printStackTrace();
+		}
 	}
 }

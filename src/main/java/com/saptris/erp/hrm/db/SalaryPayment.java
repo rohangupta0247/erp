@@ -32,7 +32,7 @@ public class SalaryPayment {
 	private Date month;
 	@Attribute(index=2)
 	private BigDecimal total;
-	@Attribute(index=3)
+	@Attribute(index=3)//FIXME map is viewin info on table row click
 	@ElementCollection(fetch=FetchType.EAGER)
 	private Map<Payhead, BigDecimal> payment_breakup;
 	/*@OneToOne @JoinColumn(name="payhead_id")

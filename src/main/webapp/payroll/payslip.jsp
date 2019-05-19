@@ -1,3 +1,13 @@
+<%@page import="java.util.Map.Entry"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.saptris.erp.hrm.db.Payhead"%>
+<%@page import="java.util.Map"%>
+<%@page import="java.math.BigDecimal"%>
+<%@page import="com.saptris.erp.hrm.db.SalaryPayment"%>
+<%@page import="com.saptris.erp.hrm.db.Employee"%>
+
+<%--jsp:include page="../header.jsp" /--%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,6 +17,29 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  </head>
+  <body>
+
+
+<%@page isELIgnored="false"%>
+<% Boolean loginStatus= (Boolean)pageContext.getAttribute("loginStatus", PageContext.REQUEST_SCOPE); 
+if( loginStatus!=null && loginStatus==false){
+		request.getSession(false).invalidate();
+		//in this case we dont want further excecutions
+		return;
+}%>
+		
+<%
+boolean searchStatus= (Boolean)request.getAttribute("searchStatus");
+SalaryPayment salary=null;
+int nowd=-1,present=-1;
+if(searchStatus==true){
+salary= (SalaryPayment)request.getAttribute("salary");
+nowd= (Integer)request.getAttribute("nowd");
+present= (Integer)request.getAttribute("present");
+}
+%>
+
 <style>
 @media print {
 body {-webkit-print-color-adjust: exact;}
@@ -42,38 +75,81 @@ WinPrint.close();
 }
 </script>
 
-  </head>
-  <body>
+  
+
+  
     <div class="container">
+    
+    <%if(searchStatus==false){ %>
+    <h3 class="text-center" style="margin-top:50px;">No such detail exists</h3>
+    <%}else{ 
+
+Employee employee= salary.getEmployee();
+String month= salary.getMonth().toString();
+//TODO long
+int empID= employee.getEmployee_id();
+String empName= employee.getName();
+String empDesignation= employee.getDesignation();
+String empDepartment= employee.getDepartment();
+String empDOB= employee.getDate_of_birth().toString();
+String empDOJ= employee.getDate_of_joining().toString();
+
+BigDecimal total= salary.getTotal();
+
+Map<Payhead, BigDecimal> map= salary.getPayment_breakup();
+
+ArrayList<String> eplist= new ArrayList<>();
+ArrayList<String> dplist= new ArrayList<>();
+ArrayList<BigDecimal> ealist= new ArrayList<>();
+ArrayList<BigDecimal> dalist= new ArrayList<>();
+BigDecimal etotal= new BigDecimal("0.0"), dtotal= new BigDecimal("0.0");
+
+for(Entry<Payhead, BigDecimal> entry: map.entrySet()){
+	Payhead p= entry.getKey();
+	BigDecimal b= entry.getValue();
+	if(p.getType().equals("Earning")){
+		eplist.add(p.getPayhead_name());
+		ealist.add(b);
+		etotal=etotal.add(b);
+	}
+	else if(p.getType().equals("Deduction")){
+		dplist.add(p.getPayhead_name());
+		dalist.add(b);
+		dtotal=dtotal.add(b);
+	}
+}
+
+String [] epayhead=eplist.toArray(new String[]{}), dpayhead=dplist.toArray(new String[]{});
+BigDecimal [] eamt=ealist.toArray(new BigDecimal[]{}), damt=dalist.toArray(new BigDecimal[]{});
+    	
+    %>
+    
 <button id='print-button' onclick='printPage()'>Print</button>
 <br>
-	<h1 class="text-center">ABHI SHARMA</h1>
-	<h3 class="text-center">Pay Slip January,2019</h3>
+	<h1 class="text-center"><%= empName %></h1>
+	<h3 class="text-center">Pay Slip <%=month %></h3>
   <div class="text-center">
     <!--div class="col-sm-3">
       <img src="EMP_IMAGE.jpg" class="img-thumbnail" alt="IMAGE OF THE EMPLOYEE">
     </div-->
     <div>
-		EMP_ID: 0001<BR>
-		NAME: ABHI SHARMA<BR>
-		DOB: 29/02/2000<BR>
-		DESIGNATION: DEVELOPER<BR>
-		DEPARTMENT: DEVELOPMENT<BR>
-		LOCATION: INDIA<BR>
-		DATE OF JOINING: 01/01/2019<BR>
-		PF ACCOUNT NUMBER: 58765978456<BR>
-		RATING: 7.0/10.0
+		Employee ID:<%=empID %> <BR>
+		Name: <%=empName %><BR>
+		DOB: <%=empDOB %><BR>
+		Designation: <%=empDesignation %><BR>
+		Department: <%=empDepartment %><BR>
+		Location: INDIA<BR>
+		Date Of Joining: <%=empDOJ %><BR>
     </div>
   </div>
   <BR>
   <div class="text-center">
   <h5>ATTENDANCE DETAILS</h5>
   	  <br>
-  	  TOTAL WORKING DAYS : 25
+  	  TOTAL WORKING DAYS : <%=nowd %>
       <br>
-      NO. OF DAYS PRESENT : 20
-      <br>
-	  NO. OF DAYS ABSENT : 5
+      NO. OF DAYS PRESENT : <%=present %>
+      
   <!--div class="col-sm-6">
       <table class="table table-hover">
 		<thead>
@@ -110,25 +186,19 @@ WinPrint.close();
       </tr>
     </thead>
     <tbody>
+      <%for(int i=0;i<epayhead.length;i++){ %>
       <tr>
-        <td>BASIC SALARY</td>
-        <td>8333.00</td>
+        <td><%=epayhead[i] %></td>
+        <td><%=eamt[i] %></td>
       </tr>
-      <tr>
-        <td>DA</td>
-        <td>667.00</td>
-      </tr>
-      <tr>
-        <td>HRA</td>
-        <td>3333.00</td>
-      </tr>
+      <%} %>
     </tbody>
   </table>
 	  <table class="table table-hover">
     	<thead>
 	  <tr>
         <th><U>TOTAL EARNING</U></th>
-        <th><U>12333.00</U></th>
+        <th><U><%=etotal %></U></th>
       </tr>
       </thead></table>
     </div>
@@ -141,42 +211,37 @@ WinPrint.close();
       </tr>
     </thead>
     <tbody>
+      <%for(int i=0;i<dpayhead.length;i++){ %>
       <tr>
-        <td>CANTEEN DEDUCTIONS</td>
-        <td>1000.00</td>
+        <td><%=dpayhead[i] %></td>
+        <td><%=damt[i] %></td>
       </tr>
-      <tr>
-        <td>EPF @ 12%</td>
-        <td>1080.00</td>
-      </tr>
-      <tr>
-        <td>ESI DEDUCTION @ 1.75%</td>
-        <td>230.00</td>
-      </tr>
-	  
+      <%} %>
     </tbody>
   </table>
 	  <table class="table table-hover">
     	<thead>
 	  <tr>
         <th><U>TOTAL DEDUCTION</U></th>
-        <th><U>2310.00</U></th>
+        <th><U><%=dtotal %></U></th>
       </tr>
 	  <tr>
         <th><B><U>NET AMOUNT</U></B></th>
-        <th><B><U>10023.00</U></B></th>
+        <th><B><U><%=total %></U></B></th>
       </tr>
     </thead>
       </table>
     </div>
   </div>
   
-  
-  
 	</div>
+	
+	<%} %>
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   </body>
 </html>
+
+<%--jsp:include page="../footer.jsp" /--%>
