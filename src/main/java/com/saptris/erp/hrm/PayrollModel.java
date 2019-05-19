@@ -291,12 +291,10 @@ public class PayrollModel {
 			while(tempset.size()!=0){
 				Set<Payhead> tempsetcopy= new HashSet<>();
 				tempsetcopy.addAll(tempset);
-				/**/System.out.println("tempsetcopy: "+tempsetcopy);
 				for(Payhead pay: tempsetcopy) {
 					if(pay.getPayhead()==null||pay.getPayhead().size()==0) {
 						amtMap.put(pay, ratesMap.get(pay));
 						tempset.remove(pay);
-						/**/System.out.println("added "+pay.getPayhead_name());
 					}
 					else {
 						BigDecimal bgtemp=null, bgtotal= new BigDecimal("0.0");
@@ -313,12 +311,10 @@ public class PayrollModel {
 						if(!flag) {
 							amtMap.put(pay, ratesMap.get(pay).multiply(bgtotal).divide(new BigDecimal("100.00"), scaleForDecimal, roundingMode));
 							tempset.remove(pay);
-							/**/System.out.println("added "+pay.getPayhead_name());
 						}
 					}
 				}
 			}
-			/**/System.out.println("amt map: "+amtMap);
 
 			BigDecimal total= new BigDecimal("0.0");
 			for(Entry<Payhead,BigDecimal> entry: amtMap.entrySet()) {
