@@ -34,6 +34,7 @@ public class Employee {
 	@Attribute(index=4, values= {"Male", "Female", "Others"})
 	private String gender;
 	@Attribute(index=5)
+	//FIXME notnull here or validation for null in payslip 
 	private Date date_of_birth;
 	@Attribute(index=6, values= {"Married", "Unmarried"})
 	private String marital_status;
@@ -42,6 +43,7 @@ public class Employee {
 	@Attribute(index=8)
 	private String designation;
 	@Attribute(index=9)
+	//FIXME notnull here or validation for null in payslip
 	private Date date_of_joining;
 	@Attribute(index=10)
 	@ManyToMany(fetch=FetchType.EAGER) @JoinColumn(name = "payhead_id")
