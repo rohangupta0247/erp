@@ -35,7 +35,7 @@ try{
 				//hbnSession.createSQLQuery("drop table "+user+"_"+EntityManager.toUnderscoreCaseFromCamelCase(tableName)).executeUpdate();
 			
 			//tables have internal dependencies, so need to drop in following order only
-			String[] tablesList= {"company","item_temp","warehouse","vendors","item",
+			String[] tablesList= {"company","item_temp","item","warehouse","vendors",
 								  "employee","bank_account","fixed_payheads_rates__fixed_payheads_rates","fixed_payheads_rates",
 								  };
 			for(String temp: tablesList)
