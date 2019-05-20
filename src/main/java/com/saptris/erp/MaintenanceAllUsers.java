@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import com.saptris.erp.User;
 import com.saptris.erp.annotation.Attribute;
+import com.saptris.erp.annotation.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,20 +30,20 @@ public class MaintenanceAllUsers {
 	
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int maintenance_id;
-	@Attribute(index=0)
+	@Attribute(index=0) @NotNull
 	private String item_name;
-	@Attribute(index=1)
+	@Attribute(index=1) @NotNull
 	private Date maintenance_time;
 	@Attribute(index=2)
 	private String description;
-	@OneToOne @JoinColumn(name="username")
+	@OneToOne @JoinColumn(name="username") @NotNull
 	@Attribute(index=3)
 	private User user;
-	@Attribute(index=4)
+	@Attribute(index=4) @NotNull
 	private String maintainer_name;
-	@Attribute(index=5)
+	@Attribute(index=5) @NotNull
 	private String maintainer_email;
-	@Attribute(index=6)
+	@Attribute(index=6) @NotNull
 	private String maintainer_phone;
 
 	@Override
