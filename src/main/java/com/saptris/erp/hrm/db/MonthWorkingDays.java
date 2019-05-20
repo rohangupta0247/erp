@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
 import com.saptris.erp.annotation.Month;
+import com.saptris.erp.annotation.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,9 +20,9 @@ import lombok.Setter;
 public class MonthWorkingDays {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int month_id;
-	@Attribute(index=0) @Month
+	@Attribute(index=0) @NotNull @Month
 	private Date month;
-	@Attribute(index=1)
+	@Attribute(index=1) @NotNull
 	private int number_of_working_days;
 
 	@Override

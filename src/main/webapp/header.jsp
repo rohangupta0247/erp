@@ -92,7 +92,8 @@
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Company">Company</a></li>
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Warehouse">Warehouse</a></li>
 				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=ItemTemp">Item</a></li>
-				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Vendors">Vendor</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Vendor">Vendor</a></li>
+				<li class="nav-item"><a class="nav-link" href="<%= currentPage %>?query=Customer">Customer</a></li>
 				<li class="nav-item"><a class="nav-link" href="payroll">Payroll</a></li>
 				<li class="nav-item"><a class="nav-link" href="save?query=MaintenanceAllUsers">Preventive-Maintenance</a></li>
 				<li class="nav-item"><a class="nav-link" href="logout">Logout</a></li>

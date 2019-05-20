@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
 import com.saptris.erp.annotation.Month;
+import com.saptris.erp.annotation.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,10 +22,10 @@ import lombok.Setter;
 public class MonthlyDetail {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int detail_id;
-	@Attribute(index=0)
+	@Attribute(index=0) @NotNull
 	@OneToOne @JoinColumn(name="employee_id")
 	private Employee employee;
-	@Attribute(index=1) @Month
+	@Attribute(index=1) @NotNull @Month
 	private Date month;
 	@Attribute(index=2)
 	private int present;

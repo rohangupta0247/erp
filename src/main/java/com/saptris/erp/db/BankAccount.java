@@ -7,57 +7,24 @@ import javax.persistence.Id;
 
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
+import com.saptris.erp.annotation.NotNull;
 
-@Entity
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity @Getter @Setter
 public class BankAccount {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int account_id;
-	@Attribute(index=0)
-	private String name;
-	@Attribute(index=1)
+	@Attribute(index=0) @NotNull
+	private String name;//TODO change to bank_name
+	@Attribute(index=1) @NotNull
 	private String account_no;
-	@Attribute(index=2)
+	@Attribute(index=2) @NotNull
 	private String iFSC_code;
-	@Attribute(index=3)
+	@Attribute(index=3) @NotNull
 	private String branch;
-	public int getAccount_id() {
-		return account_id;
-	}
-	public void setAccount_id(int account_id) {
-		this.account_id = account_id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getAccount_no() {
-		return account_no;
-	}
-	public void setAccount_no(String account_no) {
-		this.account_no = account_no;
-	}
-	public String getiFSC_code() {
-		return iFSC_code;
-	}
-	public void setiFSC_code(String iFSC_code) {
-		this.iFSC_code = iFSC_code;
-	}
-	public String getBranch() {
-		return branch;
-	}
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-	public BankAccount() {
-	}
-	public BankAccount(String name, String account_no, String iFSC_code, String branch) {
-		this.name = name;
-		this.account_no = account_no;
-		this.iFSC_code = iFSC_code;
-		this.branch = branch;
-	}
+	
 	@Override
 	public String toString() {
 		return "BankAccount{"+EntityManager.separator + account_id + EntityManager.separator + name + EntityManager.separator + account_no + EntityManager.separator + iFSC_code

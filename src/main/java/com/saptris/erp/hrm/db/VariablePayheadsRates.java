@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
 import com.saptris.erp.annotation.Month;
+import com.saptris.erp.annotation.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,15 +23,15 @@ import lombok.Setter;
 public class VariablePayheadsRates {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int rate_id;
-	@Attribute(index=0)
+	@Attribute(index=0) @NotNull
 	@OneToOne @JoinColumn(name="employee_id")
 	private Employee employee;
-	@Attribute(index=1) @Month
+	@Attribute(index=1) @NotNull @Month
 	private Date month;
-	@Attribute(index=2)
+	@Attribute(index=2) @NotNull
 	@OneToOne @JoinColumn(name="payhead_id")
 	private Payhead payhead;
-	@Attribute(index=3)
+	@Attribute(index=3) @NotNull
 	private BigDecimal amount;
 
 	@Override

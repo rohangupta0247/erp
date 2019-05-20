@@ -14,6 +14,7 @@ import javax.persistence.ManyToMany;
 
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
+import com.saptris.erp.annotation.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +23,7 @@ import lombok.Setter;
 public class Payhead{
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int payhead_id;
-	@Attribute(index=0)
+	@Attribute(index=0) @NotNull
 	private String payhead_name;
 	@Attribute(index=1)
 	private BigDecimal amount/*= new BigDecimal("0")*/;
@@ -30,9 +31,9 @@ public class Payhead{
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(joinColumns = { @JoinColumn(name = "payhead_id") }, inverseJoinColumns = { @JoinColumn(name = "calculated_on_payhead") })
 	private Set<Payhead> payhead/*= new HashSet<>()*/;
-	@Attribute(index=3, values= {"Earning", "Deduction"})
+	@Attribute(index=3, values= {"Earning", "Deduction"}) @NotNull
 	private String type;
-	@Attribute(index=4, values= {"Fixed", "Variable"})
+	@Attribute(index=4, values= {"Fixed", "Variable"}) @NotNull
 	private String value;
 	//fixed fix me unable to delete this entity in db browser
 	@Override

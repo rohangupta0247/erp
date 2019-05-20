@@ -17,8 +17,11 @@ if( loginStatus!=null && loginStatus==false){
 <%
 try{
 	String user= request.getParameter("user");
+	String tableName= request.getParameter("table");
 	if(user==null)
 		out.print("No user was mentioned");
+	else if(tableName==null)
+		out.print("No table name was mentioned");
 	else{
 	//EntityManager.dropTables(user);
 	
@@ -34,17 +37,11 @@ try{
 			//for(String tableName: classes)
 				//hbnSession.createSQLQuery("drop table "+user+"_"+EntityManager.toUnderscoreCaseFromCamelCase(tableName)).executeUpdate();
 			
-			//tables have internal dependencies, so need to drop in following order only
-			String[] tablesList= {"company","item_temp","itemtemp","item","warehouse","vendors",
-								  "salary_payment_payment_breakup","salary_payment"
-								  ,"fixed_payheads_rates__fixed_payheads_rates","fixed_payheads_rates","variable_payheads_rates"
-								  ,"payhead__payhead","month_working_days","monthly_detail"
-								  ,"employee__payhead","payhead","employee","bank_account"};
-			for(String temp: tablesList){
+			String temp= tableName;
 			try{
 						out.println(temp+"<br>");
 				if(
-						hbnSession.createSQLQuery("drop table "+"if exists "+user+"_"+temp).executeUpdate()//;
+						hbnSession.createSQLQuery("drop table "/*+"if exists "*/+user+"_"+temp).executeUpdate()//;
 						>0)
 					out.println(temp+" was dropped<br>");
 				else	out.println("can't drop "+temp+"<br>");
@@ -52,7 +49,7 @@ try{
 			catch(Exception e){
 				throw new HibernateException("Some unexpected error occured while droping "+temp, e);
 			}
-			}
+			
 			txn.commit();
 		}
 		catch(Exception e){
@@ -62,9 +59,6 @@ try{
 			if(hbnSession!=null)
 				hbnSession.close();
 		}
-	
-	
-	out.print("Tables dropped");
 	}
 }
 catch(Exception e){			

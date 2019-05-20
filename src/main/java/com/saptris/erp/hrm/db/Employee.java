@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.annotation.Attribute;
+import com.saptris.erp.annotation.NotNull;
 import com.saptris.erp.db.BankAccount;
 
 import lombok.Getter;
@@ -23,9 +24,9 @@ import lombok.Setter;
 public class Employee {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private int employee_id;
-	@Attribute(index=0)
+	@Attribute(index=0) @NotNull
 	private String name;
-	@Attribute(index=1)
+	@Attribute(index=1) @NotNull
 	private String phone_no;
 	@Attribute(index=2)
 	private String email;
@@ -34,16 +35,16 @@ public class Employee {
 	@Attribute(index=4, values= {"Male", "Female", "Others"})
 	private String gender;
 	@Attribute(index=5)
-	//FIXME notnull here or validation for null in payslip 
+	 @NotNull//XXX notnull here or validation for null in payslip 
 	private Date date_of_birth;
 	@Attribute(index=6, values= {"Married", "Unmarried"})
 	private String marital_status;
-	@Attribute(index=7)
+	@Attribute(index=7) 
 	private String department;
-	@Attribute(index=8)
+	@Attribute(index=8) 
 	private String designation;
 	@Attribute(index=9)
-	//FIXME notnull here or validation for null in payslip
+	 @NotNull//XXX notnull here or validation for null in payslip
 	private Date date_of_joining;
 	@Attribute(index=10)
 	@ManyToMany(fetch=FetchType.EAGER) @JoinColumn(name = "payhead_id")

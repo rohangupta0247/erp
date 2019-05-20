@@ -1,3 +1,6 @@
+<%@page import="java.util.Locale"%>
+<%@page import="java.time.format.TextStyle"%>
+<%@page import="java.time.LocalDate"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.saptris.erp.hrm.db.Payhead"%>
@@ -86,6 +89,10 @@ WinPrint.close();
 
 Employee employee= salary.getEmployee();
 String month= salary.getMonth().toString();
+
+LocalDate ld= LocalDate.parse(month);
+month= ld.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+", "+ld.getYear();
+
 //TODO long
 int empID= employee.getEmployee_id();
 String empName= employee.getName();
@@ -136,8 +143,12 @@ BigDecimal [] eamt=ealist.toArray(new BigDecimal[]{}), damt=dalist.toArray(new B
 		Employee ID:<%=empID %> <BR>
 		Name: <%=empName %><BR>
 		DOB: <%=empDOB %><BR>
+		<%if(empDesignation!=null && !empDesignation.equals("")){ %>
 		Designation: <%=empDesignation %><BR>
+		<%} %>
+		<%if(empDepartment!=null && !empDepartment.equals("")){ %>
 		Department: <%=empDepartment %><BR>
+		<%} %>
 		Location: INDIA<BR>
 		Date Of Joining: <%=empDOJ %><BR>
     </div>
