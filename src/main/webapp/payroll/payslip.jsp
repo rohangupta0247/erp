@@ -9,25 +9,6 @@
 <%@page import="com.saptris.erp.hrm.db.SalaryPayment"%>
 <%@page import="com.saptris.erp.hrm.db.Employee"%>
 
-<%--jsp:include page="../header.jsp" /--%>
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-  <title>ERP</title>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    
-    <jsp:include page="/favicon.jsp" />
-    
-  </head>
-  <body>
-
-
 <%@page isELIgnored="false"%>
 <% Boolean loginStatus= (Boolean)pageContext.getAttribute("loginStatus", PageContext.REQUEST_SCOPE); 
 if( loginStatus!=null && loginStatus==false){
@@ -40,13 +21,93 @@ if( loginStatus!=null && loginStatus==false){
 boolean searchStatus= (Boolean)request.getAttribute("searchStatus");
 SalaryPayment salary=null;
 int nowd=-1,present=-1;
+Employee employee=null;
+String month=null;
+LocalDate ld=null;
+
+//TODO long
+int empID= -1;
+String empName= null, empDesignation= null, empDepartment= null, empDOB= null, empDOJ= null;
+BigDecimal total= null;
+Map<Payhead, BigDecimal> map= null;
+ArrayList<String> eplist= null, dplist= null;
+ArrayList<BigDecimal> ealist= null, dalist= null;
+BigDecimal etotal= null, dtotal=null;
+BigDecimal [] eamt=null, damt=null;
+String [] epayhead=null, dpayhead=null;
+String printTitle=null;
+
 if(searchStatus==true){
 salary= (SalaryPayment)request.getAttribute("salary");
 nowd= (Integer)request.getAttribute("nowd");
 present= (Integer)request.getAttribute("present");
+	
+employee= salary.getEmployee();
+month= salary.getMonth().toString();
+
+ld= LocalDate.parse(month);
+month= ld.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+", "+ld.getYear();
+
+empID= employee.getEmployee_id();
+empName= employee.getName();
+empDesignation= employee.getDesignation();
+empDepartment= employee.getDepartment();
+empDOB= employee.getDate_of_birth().toString();
+empDOJ= employee.getDate_of_joining().toString();
+
+total= salary.getTotal();
+
+map= salary.getPayment_breakup();
+
+eplist= new ArrayList<>();
+dplist= new ArrayList<>();
+ealist= new ArrayList<>();
+dalist= new ArrayList<>();
+etotal= new BigDecimal("0.0");
+dtotal= new BigDecimal("0.0");
+
+for(Entry<Payhead, BigDecimal> entry: map.entrySet()){
+Payhead p= entry.getKey();
+BigDecimal b= entry.getValue();
+if(p.getType().equals("Earning")){
+	eplist.add(p.getPayhead_name());
+	ealist.add(b);
+	etotal=etotal.add(b);
+}
+else if(p.getType().equals("Deduction")){
+	dplist.add(p.getPayhead_name());
+	dalist.add(b);
+	dtotal=dtotal.add(b);
+}
+}
+
+epayhead=eplist.toArray(new String[]{});
+dpayhead=dplist.toArray(new String[]{});
+eamt=ealist.toArray(new BigDecimal[]{});
+damt=dalist.toArray(new BigDecimal[]{});
+
+printTitle="Payslip-"+empName+"-"+ld.getMonth().getValue()+"-"+ld.getYear();
 }
 %>
 
+<%--jsp:include page="../header.jsp" /--%>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <title><%=printTitle %></title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    
+    <jsp:include page="/favicon.jsp" />
+    
+  </head>
+  <body>
+  
 <style>
 @media print {
 body {-webkit-print-color-adjust: exact;}
@@ -89,51 +150,7 @@ WinPrint.close();
     
     <%if(searchStatus==false){ %>
     <h3 class="text-center" style="margin-top:50px;">No such detail exists</h3>
-    <%}else{ 
-
-Employee employee= salary.getEmployee();
-String month= salary.getMonth().toString();
-
-LocalDate ld= LocalDate.parse(month);
-month= ld.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+", "+ld.getYear();
-
-//TODO long
-int empID= employee.getEmployee_id();
-String empName= employee.getName();
-String empDesignation= employee.getDesignation();
-String empDepartment= employee.getDepartment();
-String empDOB= employee.getDate_of_birth().toString();
-String empDOJ= employee.getDate_of_joining().toString();
-
-BigDecimal total= salary.getTotal();
-
-Map<Payhead, BigDecimal> map= salary.getPayment_breakup();
-
-ArrayList<String> eplist= new ArrayList<>();
-ArrayList<String> dplist= new ArrayList<>();
-ArrayList<BigDecimal> ealist= new ArrayList<>();
-ArrayList<BigDecimal> dalist= new ArrayList<>();
-BigDecimal etotal= new BigDecimal("0.0"), dtotal= new BigDecimal("0.0");
-
-for(Entry<Payhead, BigDecimal> entry: map.entrySet()){
-	Payhead p= entry.getKey();
-	BigDecimal b= entry.getValue();
-	if(p.getType().equals("Earning")){
-		eplist.add(p.getPayhead_name());
-		ealist.add(b);
-		etotal=etotal.add(b);
-	}
-	else if(p.getType().equals("Deduction")){
-		dplist.add(p.getPayhead_name());
-		dalist.add(b);
-		dtotal=dtotal.add(b);
-	}
-}
-
-String [] epayhead=eplist.toArray(new String[]{}), dpayhead=dplist.toArray(new String[]{});
-BigDecimal [] eamt=ealist.toArray(new BigDecimal[]{}), damt=dalist.toArray(new BigDecimal[]{});
-    	
-    %>
+    <%}else{ %>
     
 <button id='print-button' onclick='printPage()'>Print</button>
 <br>

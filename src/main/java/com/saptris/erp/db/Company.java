@@ -63,9 +63,9 @@ public class Company {
 	
 	@Override
 	public String toString() {
-		return "Company{"+EntityManager.separator + company_id + EntityManager.separator + company_name + EntityManager.separator + address + EntityManager.separator
-				+ phone_number + EntityManager.separator + email + EntityManager.separator + website + EntityManager.separator + jurisdiction + EntityManager.separator + gstin
-				+ EntityManager.separator + state + EntityManager.separator + pincode + EntityManager.separator + country + EntityManager.separator + bank_name + EntityManager.separator
+		return "Company{"+EntityManager.separator + company_id + EntityManager.separator + company_name + EntityManager.separator + phone_number + EntityManager.separator + email
+				+ EntityManager.separator + website + EntityManager.separator + address + EntityManager.separator + state + EntityManager.separator + pincode + EntityManager.separator
+				+ country + EntityManager.separator + gstin + EntityManager.separator + jurisdiction + EntityManager.separator + bank_name + EntityManager.separator
 				+ account_no + EntityManager.separator + ifsc_code + EntityManager.separator + tnc_for_customer + EntityManager.separator + deals_in + EntityManager.separator
 				+ bank_balance + EntityManager.separator + cash_balance + EntityManager.separator+"}";
 	}

@@ -40,11 +40,11 @@ public class Vendor {
 	private int payment_due;
 	@Override
 	public String toString() {
-		return "Vendor{"+EntityManager.separator + vendor_id + EntityManager.separator + vendor_name + EntityManager.separator + phone_number + EntityManager.separator + address
-				+ EntityManager.separator + state + EntityManager.separator + pincode + EntityManager.separator + email + EntityManager.separator + gst_in + EntityManager.separator
+		return "Vendor{"+EntityManager.separator + vendor_id + EntityManager.separator + vendor_name + EntityManager.separator + address + EntityManager.separator + state
+				+ EntityManager.separator + pincode + EntityManager.separator + phone_number + EntityManager.separator + email + EntityManager.separator + gst_in + EntityManager.separator
 				+ purchased + EntityManager.separator + payment_due + EntityManager.separator+"}";
 	}
-
+	
 	/*
 	@Attribute(index=9)
 	@Attribute(index=10)
