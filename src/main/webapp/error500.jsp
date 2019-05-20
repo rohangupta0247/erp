@@ -13,6 +13,8 @@
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 <!-- <link rel="stylesheet" type="text/css" href="bootstrap.css"> -->
 
+<jsp:include page="/favicon.jsp" />
+
 </head>
 <body>
 
