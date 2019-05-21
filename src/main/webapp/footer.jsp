@@ -13,6 +13,20 @@
 <div class="jumbotron text-center" style="margin-top:25px;margin-bottom: 0">
 		<p>ERP</p>
 	</div>
+	
+	
+	<div style="background-color:black;" class="text-center">
+
+		<h1 class="text-white">WEB BASED ERP</H1>
+		<BR>
+		<img src="image?image=werp.png" width="280" height="70">
+		<BR><BR>
+		<P class="text-white">CONTACT US:</P>
+		<P class="text-white">Rohan Gupta Mob.: 9650471132 Email: rohangupta0247@gmail.com</P>
+		<P class="text-white">Nishant Sharma Mob.: 7838976975  Email: 4unishant@gmail.com</P>
+		<P class="text-white">Rohit Kumar Mob.: 8588814959 Email: amankfeb03@gmail.com</P>
+  </div>
+	
 
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->

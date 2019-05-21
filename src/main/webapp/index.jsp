@@ -9,9 +9,13 @@
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <!-- Bootstrap CSS -->
 <!-- <link rel="stylesheet" href="bootstrap.min.css"> -->
-<link rel="stylesheet" type="text/css"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<!--link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"-->
 <!-- <link rel="stylesheet" type="text/css" href="bootstrap.css"> -->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <!-- default favicon -->
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -26,56 +30,13 @@
 <!-- google tv favicon -->
 <link rel="icon" href="favicon.ico" sizes="96x96" type="image/png">
 
-</head>
-<body>
-<div class="container" style="background-color:lavender;">
-
-<%@page import="com.saptris.erp.UserManager"%>
-<%@page session="false"%>
-<%
-	HttpSession session= UserManager.getSession(request);
-	String from= request.getRequestURI()+"?"+request.getQueryString();
-	String condition="Menu";
-	/*if(session==null){
-		out.print("<a href=\"login?from="+from+"\">Login</a><br>");
-		//response.sendRedirect("login?from="+from);
-		//in this case we dont want further as it is main page
-		//return;
-	}
-	else
-		out.print(session.getAttribute("name")+"'s ERP"+
-		"<br><a href=\"logout\">Logout</a><br>");
-	*/
-	if(session!=null){
-		condition= session.getAttribute("name").toString();
-	}
-%>
-
-<div class="jumbotron text-center" style="margin-bottom: 0">
-		<h1>ERP</h1>
-	</div>
-
-	<nav class="navbar navbar-expand-sm bg-dark navbar-dark" id="homeNavBar">
-		<a class="navbar-brand" href="#"><%= condition %></a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse"
-			data-target="#collapsibleNavbar">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="collapsibleNavbar">
-			<ul class="navbar-nav">
-				<% if(session==null){ %>
-				<li class="nav-item"><a class="nav-link" href="login">LogIn</a></li>
-				<li class="nav-item"><a class="nav-link" href="signup">SignUp</a></li>
-				<% } else { %>
-				<li class="nav-item"><a class="nav-link" href="logout">LogOut</a></li>
-				<% } %>
-			</ul>
-		</div>
-	</nav>
-
-
-
 <style>
+/* Make the image fully responsive */
+  .carousel-inner img {
+    width: 40%;
+    height: 20%;
+	
+  }
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -122,6 +83,56 @@ body {
 }
 </style>
 
+</head>
+<body>
+
+<%@page import="com.saptris.erp.UserManager"%>
+<%@page session="false"%>
+<%
+	HttpSession session= UserManager.getSession(request);
+	String from= request.getRequestURI()+"?"+request.getQueryString();
+	String condition="Menu";
+	/*if(session==null){
+		out.print("<a href=\"login?from="+from+"\">Login</a><br>");
+		//response.sendRedirect("login?from="+from);
+		//in this case we dont want further as it is main page
+		//return;
+	}
+	else
+		out.print(session.getAttribute("name")+"'s ERP"+
+		"<br><a href=\"logout\">Logout</a><br>");
+	*/
+	if(session!=null){
+		condition= session.getAttribute("name").toString();
+	}
+%>
+
+
+<!--div class="container" style="background-color:lavender;"-->
+<div style="background-color:lavender;">
+
+<div class="jumbotron text-center" style="margin-bottom: 0">
+		<h1>ERP</h1>
+	</div>
+
+	<nav class="navbar navbar-expand-sm bg-dark navbar-dark" id="homeNavBar">
+		<a class="navbar-brand" href="#"><%= condition %></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#collapsibleNavbar">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="collapsibleNavbar">
+			<ul class="navbar-nav">
+				<% if(session==null){ %>
+				<li class="nav-item"><a class="nav-link" href="login">LogIn</a></li>
+				<li class="nav-item"><a class="nav-link" href="signup">SignUp</a></li>
+				<% } else { %>
+				<li class="nav-item"><a class="nav-link" href="logout">LogOut</a></li>
+				<% } %>
+			</ul>
+		</div>
+	</nav>
+
 <div id="demo" class="carousel slide" data-ride="carousel" align="center" style="background-color:black;">
   <ul class="carousel-indicators">
     <li data-target="#demo" data-slide-to="0" class="active"></li>
@@ -164,7 +175,7 @@ body {
   <!--div class="card-deck"-->
   
 <div class="col">
-    <div class="flip-card">
+    <div class="flip-card" style="margin-bottom:20px;">
   <div class="flip-card-inner">
     <div class="flip-card-front">
       <img src="image?image=comapny-512x512.png" alt="Comapny" style="width:300px;height:300px;">
@@ -182,7 +193,7 @@ body {
 </div></div>
 	
     <div class="col">
-	<div class="flip-card">
+	<div class="flip-card" style="margin-bottom:20px;">
   <div class="flip-card-inner">
     <div class="flip-card-front">
       <img src="image?image=payroll-800x800.png" alt="Payroll" style="width:300px;height:300px;">
@@ -200,7 +211,7 @@ body {
 </div></div>
 	
     <div class="col">
-	<div class="flip-card">
+	<div class="flip-card" style="margin-bottom:20px;">
   <div class="flip-card-inner">
     <div class="flip-card-front">
       <img src="image?image=warehouse.jpg" alt="Warehouse" style="width:300px;height:300px;">
@@ -211,7 +222,41 @@ body {
       <p>Manage the warehouse</p> 
       <p>Store all item details in the warehouse</p>
       <div align="center">
-		<a href="payroll" class="btn btn-info" style="margin-top:20px;" role="button">Open Warehouse</a>
+		<a href="view?query=Warehouse" class="btn btn-info" style="margin-top:20px;" role="button">Open Warehouse</a>
+	</div>
+    </div>
+  </div>
+</div></div>
+
+<div class="col">
+	<div class="flip-card" style="margin-bottom:20px;">
+  <div class="flip-card-inner">
+    <div class="flip-card-front">
+      <img src="image?image=maintenace-reminder-300x300.png" alt="Maintenace Reminder" style="width:300px;height:300px;">
+	  <!-- img src="warehouse.jpg" alt="Warehouse" style="width:300px;height:300px;" -->
+    </div>
+    <div class="flip-card-back">
+      <h1>Preventive Maintenance</h1> 
+      <p>Add reminder for a preventive maintenace</p> 
+      <div align="center">
+		<a href="save?query=MaintenanceAllUsers" class="btn btn-info" style="margin-top:20px;" role="button">Add reminder</a>
+	</div>
+    </div>
+  </div>
+</div></div>
+
+<div class="col">
+	<div class="flip-card" style="margin-bottom:20px;">
+  <div class="flip-card-inner">
+    <div class="flip-card-front">
+      <img src="image?image=item-518x500.png" alt="Items" style="width:300px;height:300px;">
+	  <!-- img src="warehouse.jpg" alt="Warehouse" style="width:300px;height:300px;" -->
+    </div>
+    <div class="flip-card-back">
+      <h1>Inventory</h1> 
+      <p>Add and manage items stock in inventory</p> 
+      <div align="center">
+		<a href="view?query=ItemTemp" class="btn btn-info" style="margin-top:20px;" role="button">View Items</a>
 	</div>
     </div>
   </div>
@@ -219,30 +264,8 @@ body {
 	
   </div>
   <!--/div-->
-  <br>
-  <br>
   
+<jsp:include page="footer.jsp" />
   
-  
-  <br>
-  
-	<BR><BR>
-  <div style="background-color:black;">
-
-		<h1 class="text-white">&nbsp; WEB BASED ERP</H1>
-		<BR>
-		&nbsp; <img src="WERP.PNG" width="280" height="70">
-		<BR><BR>
-		<P class="text-white">&nbsp; CONTACT US:</P>
-		<P class="text-white">&nbsp; Nishant Sharma Mob.: 9999999999 Email: 4unishant@gmail.com</P>
-		<P class="text-white">&nbsp; Rohan Gupta Mob.: 9650471132 Email: rohangupta0247@gmail.com</P>
-		<P class="text-white">&nbsp; Rohit Kumar Mob.: 9999999999 Email: rohitkumar@gmail.com</P>
-  </div>
-
 </div>
 
-
-
-
-
-<jsp:include page="footer.jsp" />
