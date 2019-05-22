@@ -39,7 +39,8 @@ public class ReminderScheduler extends Thread {
 			
 			//time is in 24hr format
 			//LocalDateTime reminderDateTime= LocalDateTime.of(2019, 3, 19, 14, 50, 00);
-			LocalDateTime currentDateTime= LocalDateTime.now();
+			//LocalDateTime currentDateTime= LocalDateTime.now();
+			LocalDateTime currentDateTime= getZoneLocalDateTime(new Date());
 			if(reminderDateTime.isAfter(currentDateTime)) {
 				System.out.println("scheduling "+maintenance.getMaintenance_id()+" @ "+reminderDateTime);
 				timer.schedule(new MaintenanceReminderTask(UserManager.getUser(), maintenance), Date.from(reminderDateTime.atZone(ZONE_ID).toInstant()));
@@ -103,13 +104,13 @@ public class ReminderScheduler extends Thread {
 		Mail.sendMail(UserManager.getUser().getEmail(), "Added a new preventive maintenance reminder", message);
 	}
 	
-	private static LocalDateTime getZoneLocalDateTime(Date date) {
+	public static LocalDateTime getZoneLocalDateTime(Date date) {
 		return date.toInstant().atZone(ZONE_ID).toLocalDateTime();
 		//time is in 24hr format
 		//LocalDateTime reminderDateTime= LocalDateTime.of(2019, 3, 19, 14, 50, 00);
 	}
 	
-	private static Date getZoneDate(Date date) {
+	public static Date getZoneDate(Date date) {
 		LocalDateTime dateTime= getZoneLocalDateTime(date);
 		return Date.from(dateTime.atZone(ZONE_ID).toInstant());
 	}
