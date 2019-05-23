@@ -11,7 +11,7 @@ import com.saptris.erp.MaintenanceAllUsers;
 import com.saptris.erp.UserManager;
 
 public class ReminderScheduler extends Thread {
-	private static final ZoneId ZONE_ID= ZoneId.of("Asia/Kolkata")/*ZoneId.systemDefault()*/;
+	private static final ZoneId ZONE_ID= ZoneId.of("Asia/Kolkata");
 	
 	//private boolean running;
 	private static Timer timer;
@@ -98,20 +98,22 @@ public class ReminderScheduler extends Thread {
 		
 		//in case of server terminations, needed to schedule according to database in starting
 		//and this will schedule ongoing reminders
-		System.out.println("scheduling "+maintenanceEntity.getMaintenance_id()+" @ "+getZoneLocalDateTime(maintenanceEntity.getMaintenance_time()));
+		//System.out.println("scheduling "+maintenanceEntity.getMaintenance_id()+" @ "+getZoneLocalDateTime(maintenanceEntity.getMaintenance_time()));
 		timer.schedule(new MaintenanceReminderTask(UserManager.getUser(), maintenanceEntity), getZoneDate(maintenanceEntity.getMaintenance_time()));
 		
 		Mail.sendMail(UserManager.getUser().getEmail(), "Added a new preventive maintenance reminder", message);
 	}
 	
 	public static LocalDateTime getZoneLocalDateTime(Date date) {
+		//only time is changed according to zone, the time zone in the object will remain same
 		return date.toInstant().atZone(ZONE_ID).toLocalDateTime();
 		//time is in 24hr format
 		//LocalDateTime reminderDateTime= LocalDateTime.of(2019, 3, 19, 14, 50, 00);
 	}
 	
 	public static Date getZoneDate(Date date) {
+		//only time is changed according to zone, the time zone in the object will remain same
 		LocalDateTime dateTime= getZoneLocalDateTime(date);
-		return Date.from(dateTime.atZone(ZONE_ID).toInstant());
+		return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
 }
