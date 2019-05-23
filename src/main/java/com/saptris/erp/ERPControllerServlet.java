@@ -469,8 +469,8 @@ public class ERPControllerServlet extends HttpServlet {
 			//to check for maintenance reminder if time is earlier than server system time
 			if(request.getParameter("query").equals("MaintenanceAllUsers")) {
 				//2001-01-01T13:00
-				LocalDateTime reminderDateTime= ReminderScheduler.getZoneLocalDateTime(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(request.getParameterMap().get("maintenance-time")[0]));
-				LocalDateTime currentDateTime= ReminderScheduler.getZoneLocalDateTime(new Date());
+				LocalDateTime reminderDateTime= ReminderScheduler.getSystemZoneLocalDateTime(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(request.getParameterMap().get("maintenance-time")[0]));
+				LocalDateTime currentDateTime= ReminderScheduler.toLocalDateTime(new Date());
 				if(reminderDateTime.isBefore(currentDateTime)) {
 					return redirectionRequest+"wrong-time";
 				}

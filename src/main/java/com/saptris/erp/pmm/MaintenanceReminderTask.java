@@ -11,14 +11,13 @@ import org.hibernate.HibernateException;
 import com.saptris.erp.EntityManager;
 import com.saptris.erp.Mail;
 import com.saptris.erp.MaintenanceAllUsers;
-import com.saptris.erp.User;
 
 public class MaintenanceReminderTask extends TimerTask{
-	User user;
+	//User user;
 	MaintenanceAllUsers maintenanceEntity;
-	public MaintenanceReminderTask(User user, MaintenanceAllUsers maintenanceEntity) {
+	public MaintenanceReminderTask(/*User user, */MaintenanceAllUsers maintenanceEntity) {
 		super();
-		this.user= user;
+		//this.user= user;
 		this.maintenanceEntity= maintenanceEntity;
 	} 
 	@Override
@@ -45,14 +44,16 @@ public class MaintenanceReminderTask extends TimerTask{
 		
 		//send mail
 		try {
-			Mail.sendMail(user.getEmail(), subjectUser, messageUser);
+			//Mail.sendMail(user.getEmail(), subjectUser, messageUser);
+			Mail.sendMail(maintenanceEntity.getUser().getEmail(), subjectUser, messageUser);
 			Mail.sendMail(maintenanceEntity.getMaintainer_email(), subjectMaintainer, messageMaintainer);
 		} catch (Exception e) {
 			throw new HibernateException("Some unexpected error occured while sending mail for reminder task", e);
 		}
 		
 		//send sms
-		String response= sendSms(user.getPhone(), messageUser);
+		//String response= sendSms(user.getPhone(), messageUser);
+		String response= sendSms(maintenanceEntity.getUser().getPhone(), messageUser);
 		if(!response.contains(",\"status\":\"success\"}"))
 			System.out.println("User SMS was not successfully send for reminder");
 		response= sendSms(maintenanceEntity.getMaintainer_phone(), messageMaintainer);
@@ -62,7 +63,8 @@ public class MaintenanceReminderTask extends TimerTask{
 	
 	private String sendSms(String phone, String message) {
 		try {
-			String test= "&test=true";
+			String test= "";
+			//String test= "&test=true";
 			
 			// Construct data
 			String apiKey = "apikey=" + "92Ty3xk/0Iw-AuJhW3j5isFqUQbVreZAeHCSMOEy8O";
