@@ -63,8 +63,8 @@ public class MaintenanceReminderTask extends TimerTask{
 	
 	private String sendSms(String phone, String message) {
 		try {
-			String test= "";
-			//String test= "&test=true";
+			//String test= "";
+			String test= "&test=true";
 			
 			// Construct data
 			String apiKey = "apikey=" + "92Ty3xk/0Iw-AuJhW3j5isFqUQbVreZAeHCSMOEy8O";
